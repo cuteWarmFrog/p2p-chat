@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useCallback} from "react";
 import {View, Text, StyleSheet} from "react-native";
 import IO from "socket.io-client";
 
@@ -6,7 +6,8 @@ import { mediaDevices, RTCView } from 'react-native-webrtc';
 
 import Peer from 'react-native-peerjs';
 
-const URL = 'http://192.168.31.188:6000';
+// const URL = 'http://172.28.76.96:6000';
+const URL = 'http://joeyke.ru:14050';
 
 export const Chat = ({ route }) => {
     const [myStream, setMyStream] = useState(null);
@@ -14,7 +15,7 @@ export const Chat = ({ route }) => {
 
     const { roomId } = route.params;
 
-    const joinRoom = (stream) => {
+    const joinRoom = useCallback((stream) => {
 
         const connectToNewUser = (userId, stream) => {
             const call = peerServer.call(userId, stream);
@@ -30,9 +31,9 @@ export const Chat = ({ route }) => {
         });
 
         const peerServer = new Peer(undefined, {
-            host: '192.168.31.188',
+            host: 'joeyke.ru',
             secure: false,
-            // port: 6000,
+            port: 14050,
             path: '/mypeer'
         });
 
@@ -41,7 +42,8 @@ export const Chat = ({ route }) => {
         setMyStream(stream);
 
         peerServer.on('open', (userId) => {
-            socket.emit('join-room', { userId, roomId })
+            socket.emit('join-room', { userId, roomId });
+            console.log('join-room: ', userId, roomId);
         })
 
         peerServer.on('call', (call) => {
@@ -55,7 +57,7 @@ export const Chat = ({ route }) => {
         socket.on('user-connected', (userId) => {
             connectToNewUser(userId, stream);
         })
-    }
+    }, []);
 
     useEffect(() => {
         let isFront = true;
@@ -114,6 +116,6 @@ const styles = StyleSheet.create({
     streamView: {
         height: 280,
         borderColor: "yellow",
-        borderWidth: 4
+        borderWidth: 4,
     }
 })

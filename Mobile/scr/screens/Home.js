@@ -40,7 +40,7 @@ export const Home = () => {
     return (
         <View style={styles.container}>
             <View style={styles.inputContainer}>
-                <Text style={{ alignSelf: 'center', fontSize: 24, margin: 8, fontWeight: 'bold' }}>KABAN P2P webRTC</Text>
+                <Text style={{ alignSelf: 'center', fontSize: 24, margin: 8, fontWeight: 'bold' }}>P2P webRTC</Text>
                 <TextInput
                     placeholder="Room ID"
                     selectionColor="#DDD"

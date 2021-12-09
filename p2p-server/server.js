@@ -24,6 +24,7 @@ const peerServer = ExpressPeerServer(server, {
 app.use('/mypeer', peerServer);
 
 io.on('connection', (socket) => {
+    console.log('logi ebat cabana');
     socket.on('join-room', ({ roomId, userId }) => {
         socket.join(roomId);
         socket.to(roomId).broadcast.emit('user-connected', userId);
