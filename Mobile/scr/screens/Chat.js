@@ -91,17 +91,19 @@ export const Chat = ({ route }) => {
 
     return (
         <View style={styles.container}>
-            <Text>{roomId} здесь будут ебать кабана</Text>
+            <Text style={styles.baseText}>Your room id:
+                <Text style={{color: 'red'}}> {roomId} </Text>
+            </Text>
             {myStream && <View style={styles.streamView}>
                 <RTCView style={{
-                    height: 250,
-                    width: 250
+                    height: 300,
+                    width: 350
                 }} streamURL={myStream.toURL()}/>
             </View>}
             {partnerStream && <View style={styles.streamView}>
                 <RTCView style={{
-                    height: 250,
-                    width: 250
+                    height: 300,
+                    width: 350
                 }} streamURL={partnerStream.toURL()}/>
             </View>}
         </View>
@@ -110,12 +112,17 @@ export const Chat = ({ route }) => {
 
 const styles = StyleSheet.create({
     container: {
-        padding: 5,
+        padding: 8,
     },
 
     streamView: {
-        height: 280,
-        borderColor: "yellow",
-        borderWidth: 4,
+        height: 330,
+        borderColor: "grey",
+        borderWidth: 7,
+    },
+
+    baseText: {
+      fontSize: 18,
+      color: 'black'
     }
 })
