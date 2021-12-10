@@ -1,8 +1,10 @@
 import React, {useEffect, useState, useCallback} from "react";
-import {View, Text, StyleSheet} from "react-native";
+import {View, Text, StyleSheet, Button} from "react-native";
 import IO from "socket.io-client";
 
 import { mediaDevices, RTCView } from 'react-native-webrtc';
+
+import InCallManager from 'react-native-incall-manager';
 
 import Peer from 'react-native-peerjs';
 
@@ -48,7 +50,7 @@ export const Chat = ({ route }) => {
 
         peerServer.on('call', (call) => {
             call.answer(stream);
-
+            InCallManager.start({media: 'video'}); //runtime call manager
             call.on('stream', (stream) => {
                 setPartnerStream(stream);
             })
@@ -89,11 +91,21 @@ export const Chat = ({ route }) => {
         });
     }, [])
 
+    const speakerphoneHandler = () => {
+        InCallManager.setForceSpeakerphoneOn(true);
+        //InCallManager.startRingtone('DEFAULT');
+    }
+
     return (
         <View style={styles.container}>
             <Text style={styles.baseText}>Your room id:
                 <Text style={{color: 'red'}}> {roomId} </Text>
             </Text>
+            <Button
+                color='#007AFF'
+                onPress={speakerphoneHandler}
+                title="Speakerphone"
+            />
             {myStream && <View style={styles.streamView}>
                 <RTCView style={{
                     height: 300,
