@@ -1,11 +1,11 @@
 import React, {useEffect, useState, useCallback} from "react";
 import {View, Text, StyleSheet, Button} from "react-native";
 import IO from "socket.io-client";
+import {VideoChat} from "../components/VideoChat";
 
-import { mediaDevices, RTCView } from 'react-native-webrtc';
+import { mediaDevices } from 'react-native-webrtc';
 
 import InCallManager from 'react-native-incall-manager';
-
 import Peer from 'react-native-peerjs';
 
 // const URL = 'http://172.28.76.96:6000';
@@ -13,7 +13,7 @@ const URL = 'http://joeyke.ru:14050';
 
 export const Chat = ({ route }) => {
     const [myStream, setMyStream] = useState(null);
-    const [partnerStream, setPartnerStream] = useState(null);
+    const [remoteStreams, setRemoteStreams] = useState([]);
 
     const { roomId } = route.params;
 
@@ -23,7 +23,7 @@ export const Chat = ({ route }) => {
             const call = peerServer.call(userId, stream);
             call.on('stream', (remoteVideoStream) => {
                 if (remoteVideoStream) {
-                    setPartnerStream(remoteVideoStream)
+                    setRemoteStreams((partnerStreams) => partnerStreams.concat(remoteVideoStream))
                 }
             })
         }
@@ -52,7 +52,7 @@ export const Chat = ({ route }) => {
             call.answer(stream);
             InCallManager.start({media: 'video'}); //runtime call manager
             call.on('stream', (stream) => {
-                setPartnerStream(stream);
+                setRemoteStreams(stream);
             })
         })
 
@@ -75,8 +75,10 @@ export const Chat = ({ route }) => {
             mediaDevices.getUserMedia({
                 audio: true,
                 video: {
-                    width: 640,
-                    height: 480,
+                    // width: 640,
+                    // height: 480,
+                    width: 720,
+                    height: 1280,
                     frameRate: 30,
                     facingMode: (isFront ? "user" : "environment"),
                     deviceId: videoSourceId
@@ -97,33 +99,16 @@ export const Chat = ({ route }) => {
     }
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.baseText}>Your room id:
-                <Text style={{color: 'red'}}> {roomId} </Text>
-            </Text>
-            <Button
-                color='#007AFF'
-                onPress={speakerphoneHandler}
-                title="Speakerphone"
-            />
-            {myStream && <View style={styles.streamView}>
-                <RTCView style={{
-                    height: 300,
-                    width: 350
-                }} streamURL={myStream.toURL()}/>
-            </View>}
-            {partnerStream && <View style={styles.streamView}>
-                <RTCView style={{
-                    height: 300,
-                    width: 350
-                }} streamURL={partnerStream.toURL()}/>
-            </View>}
-        </View>
+        <VideoChat
+            myStream={myStream}
+            remoteStreams={[myStream]}
+        />
     )
 }
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
         padding: 8,
     },
 
