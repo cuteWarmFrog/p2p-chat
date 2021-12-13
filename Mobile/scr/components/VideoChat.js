@@ -1,21 +1,19 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 
-import {ScrollView, View, StyleSheet, Text} from 'react-native';
+import {ScrollView, View, StyleSheet } from 'react-native';
 import { RTCView } from "react-native-webrtc";
 
 export const VideoChat = ({myStream, remoteStreams}) => {
-    const [page, setPage] = useState(0);
 
     const renderStreamHalfScreen = (stream1, stream2) => {
         console.log('renderStreamHalfScreen');
         return (
             <>
                 <View style={styles.streamView}>
-                    {/*<RTCView style={styles.halfScreenStream} streamURL={stream1.toURL()} />*/}
-                    <Text style={{ alignSelf: 'center', fontSize: 24, margin: 8, fontWeight: 'bold' }}>P2P webRTC</Text>
+                    <RTCView style={styles.stream} streamURL={stream1.toURL()} />
                 </View>
                 <View style={styles.streamView}>
-                    {/*<RTCView style={styles.halfScreenStream} streamURL={stream2.toURL()} />*/}
+                    <RTCView style={styles.stream} streamURL={stream2.toURL()} />
                 </View>
             </>
         )
@@ -26,12 +24,13 @@ export const VideoChat = ({myStream, remoteStreams}) => {
         return (
             <>
                 <View style={styles.streamView}>
-                    <RTCView style={styles.fullScreenStream} streamURL={stream.toURL()} />
+                    <RTCView style={styles.stream} streamURL={stream.toURL()} />
                 </View>
             </>
         )
     }, [])
 
+    //todo Лёша, нужна другая логика на свайп
     const renderMultipleStreams = useCallback((myStream, remoteStreams) => {
         console.log('remoteStream', remoteStreams)
         return (
@@ -40,7 +39,7 @@ export const VideoChat = ({myStream, remoteStreams}) => {
                 {remoteStreams.map((stream, i) => {
                     return (
                         <View key={i}>
-                            <RTCView streamURL={stream.toURL()} />
+                            <RTCView style={styles.stream} streamURL={stream.toURL()} />
                         </View>
                     )
                 })}
@@ -57,7 +56,7 @@ export const VideoChat = ({myStream, remoteStreams}) => {
         }
 
         if(remoteStreams.length === 1) {
-            renderStreamHalfScreen(myStream, remoteStreams[0])
+            return renderStreamHalfScreen(myStream, remoteStreams[0]);
         }
 
         if(remoteStreams.length > 1) {
@@ -87,24 +86,11 @@ const styles = StyleSheet.create({
         flex: 1,
         borderColor: "red",
         borderWidth: 3,
-        backgroundColor: 'red',
-        height: 200,
-        width: 200
     },
 
-    fullScreenStream: {
-        // width: "100%",
-        // height: "100%"
+    stream: {
+        width: "100%",
+        height: "100%"
     },
-
-    halfScreenStream: {
-        // width: "100%",
-        // height: "50%"
-    },
-
-    multiScreenStream: {
-        // width: "50%",
-        // height: "50%"
-    }
 
 })

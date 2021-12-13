@@ -23,7 +23,7 @@ export const Chat = ({ route }) => {
             const call = peerServer.call(userId, stream);
             call.on('stream', (remoteVideoStream) => {
                 if (remoteVideoStream) {
-                    setRemoteStreams((partnerStreams) => partnerStreams.concat(remoteVideoStream))
+                    setRemoteStreams((remoteStreams) => remoteStreams.concat(remoteVideoStream))
                 }
             })
         }
@@ -52,7 +52,7 @@ export const Chat = ({ route }) => {
             call.answer(stream);
             InCallManager.start({media: 'video'}); //runtime call manager
             call.on('stream', (stream) => {
-                setRemoteStreams(stream);
+                setRemoteStreams((remoteStreams) => remoteStreams.concat(stream));
             })
         })
 
@@ -75,10 +75,8 @@ export const Chat = ({ route }) => {
             mediaDevices.getUserMedia({
                 audio: true,
                 video: {
-                    // width: 640,
-                    // height: 480,
-                    width: 720,
-                    height: 1280,
+                    width: 640,
+                    height: 480,
                     frameRate: 30,
                     facingMode: (isFront ? "user" : "environment"),
                     deviceId: videoSourceId
