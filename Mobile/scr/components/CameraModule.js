@@ -9,7 +9,6 @@ import {
     Text,
 } from './Themed';
 
-// import {FontAwesome5} from '@expo/vector-icons';
 import { FontAwesomeIcon,  } from '@fortawesome/react-native-fontawesome'
 import {RTCView} from "react-native-webrtc";
 
@@ -41,7 +40,7 @@ const styles = StyleSheet.create({
     camera: {
         // flex: Platform.OS === 'ios' ? 1 : 0,
         // height: Platform.OS === 'ios' ? 'auto' : '100%',
-        height: "50%",
+        height: "100%",
         width: '100%',
         padding: 10,
         flexDirection: 'row-reverse',

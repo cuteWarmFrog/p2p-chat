@@ -1,5 +1,4 @@
 import React, {useCallback} from 'react';
-
 import {FlatList, StyleSheet, Text, View} from 'react-native';
 import CameraModule from "./CameraModule";
 import {VerticalPairOfStreams} from "./VerticalPairOfStreams";
@@ -86,7 +85,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    partnerCameraContainer: {},
+    partnerCameraContainer: {
+        zIndex: 10,
+        elevation: 10,
+    },
     roomCredits: {
         position: 'absolute',
         top: 0,
@@ -118,6 +120,8 @@ const styles = StyleSheet.create({
         width: '80%'
     },
     myCameraContainer: {
+        zIndex: 1000,
+        elevation: 1000,
         position: 'absolute',
         bottom: 20,
         left: 20,

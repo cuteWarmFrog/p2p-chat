@@ -1,7 +1,7 @@
 import React, {useEffect, useState, useCallback} from "react";
 import {View, Text, StyleSheet, Button} from "react-native";
 import IO from "socket.io-client";
-import {VideoChat} from "../components/VideoChat";
+import {VideoChat} from '../components/VideoChat';
 
 import { mediaDevices } from 'react-native-webrtc';
 
@@ -99,7 +99,7 @@ export const Chat = ({ route }) => {
     return (
         <VideoChat
             myStream={myStream}
-            remoteStreams={[myStream, myStream, myStream, myStream, myStream]}
+            remoteStreams={[...remoteStreams]}
             roomId={roomId}
         />
     )

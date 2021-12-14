@@ -14,7 +14,7 @@ export const VerticalPairOfStreams = ({streams}) => {
                 <CameraModule stream={up}/>
             </View>
             <View>
-                <CameraModule isMy stream={down}/>
+                <CameraModule stream={down}/>
             </View>
         </View>
     );
