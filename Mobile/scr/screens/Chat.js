@@ -99,25 +99,9 @@ export const Chat = ({ route }) => {
     return (
         <VideoChat
             myStream={myStream}
-            remoteStreams={[myStream]}
+            remoteStreams={[myStream, myStream, myStream, myStream, myStream]}
+            roomId={roomId}
         />
     )
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 8,
-    },
-
-    streamView: {
-        height: 330,
-        borderColor: "grey",
-        borderWidth: 7,
-    },
-
-    baseText: {
-      fontSize: 18,
-      color: 'black'
-    }
-})

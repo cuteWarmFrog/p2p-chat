@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Text, View, Button, TextInput, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import {PrimaryButton, SecondaryButton} from "../components/Themed";
 
 
 const BLUE = "#007AFF";
@@ -14,7 +15,7 @@ export const Home = () => {
     // Generating random room id for the initiating peer
     const generateID = () => {
         let result = '';
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const characters = 'abcdefghjkmnpqrstuvwxyz123456789';
         let charactersLength = characters.length;
         for (let i = 0; i < LENGTH; i++) {
             result += characters.charAt(Math.floor(Math.random() * charactersLength));
@@ -39,64 +40,57 @@ export const Home = () => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.inputContainer}>
-                <Text style={{ alignSelf: 'center', fontSize: 24, margin: 8, fontWeight: 'bold' }}>KABAN P2P webRTC</Text>
-                <TextInput
-                    placeholder="Room ID"
-                    selectionColor="#DDD"
-                    onChangeText={(text) => setRoomId(text)}
-                    style={styles.textInput}
-                />
-            </View>
-            <View style={styles.buttonContainer}>
-                <Button
-                    color='#007AFF'
-                    onPress={handleSubmit}
-                    title="Join Room"
-                />
-            </View>
-            <View style={styles.buttonContainer}>
-                <Button
-                    color='#007AFF'
-                    onPress={handleCreateSubmit}
-                    title="Create Room"
-                />
-                <Text style={styles.textStyle}>Don't have a Room ID? Create One :)</Text>
+            <Text style={styles.title}>You're looking beautiful today!</Text>
+            <Text style={styles.subtitle}>Make a room!</Text>
+            <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+            <TextInput
+                placeholder="Enter Room ID"
+                onChangeText={ (text) => setRoomId(text)}
+                style={ styles.textInput }
+            />
+
+            <View style={styles.buttonsWrapper}>
+                <SecondaryButton title='Join Room' onPress={ handleSubmit } />
+                <PrimaryButton title='Make Room' onPress={ handleCreateSubmit } />
             </View>
         </View>
     )
 }
 
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F8F8FF',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    title: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 8
+    },
+    subtitle: {
+        fontSize: 18,
+        fontWeight: 'normal',
+        opacity: 0.8
+    },
+    separator: {
+        marginVertical: 30,
+        height: 1,
+        width: '80%',
     },
     textInput: {
-        height: 55,
-        paddingLeft: 15,
-        paddingRight: 15,
+        width: '70%',
+        paddingVertical: 3,
+        paddingHorizontal: 40,
+        textAlign: 'center',
         fontSize: 18,
-        backgroundColor: '#fff',
-        borderWidth: .5,
+        marginBottom: 40,
+        borderBottomWidth: 1,
     },
-    inputContainer: {
-        paddingLeft: 10,
-        paddingRight: 10,
-        margin: 10,
-    },
-    buttonContainer: {
-        padding: 15,
-    },
-    textStyle: {
-        alignSelf: 'center',
-        color: '#D3D3D3',
-        marginTop: 5,
-    },
-    errorStyle: {
-        alignSelf: 'center',
-        color: '#ff0000',
-        marginBottom: 5,
-        fontSize: 12,
+    buttonsWrapper: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        width: '80%'
     }
 });
