@@ -1,12 +1,12 @@
 import React, {useCallback} from 'react';
-import {FlatList, StyleSheet, Text, View} from 'react-native';
+import {FlatList, ScrollView, StyleSheet, Text, View} from 'react-native';
 import CameraModule from "./CameraModule";
 import {VerticalPairOfStreams} from "./VerticalPairOfStreams";
+import SafeAreaView from "react-native/Libraries/Components/SafeAreaView/SafeAreaView";
 
 export const VideoChat = ({myStream, remoteStreams, roomId}) => {
 
     const renderStream = (myStream, partnerStream) => {
-        console.log('renderStream');
         return (
             <>
                 <View style={styles.partnerCameraContainer}>
@@ -19,12 +19,12 @@ export const VideoChat = ({myStream, remoteStreams, roomId}) => {
         )
     }
 
-    const renderStreamFullScreen = useCallback((stream) => {
+    const renderStreamFullScreen = (stream) => {
         console.log('renderStreamFullScreen');
         return (
             <CameraModule isMy stream={stream}/>
         )
-    }, [])
+    }
 
     const renderMultipleStreams = (myStream, remoteStreams) => {
         const pairs = [];
@@ -40,12 +40,18 @@ export const VideoChat = ({myStream, remoteStreams, roomId}) => {
         console.log(pairs.length);
 
         return (
-            <FlatList style={{backgroundColor: 'red', width: "100%"}}
-                horizontal
-                data={pairs}
-                renderItem={({item}) => <VerticalPairOfStreams streams={item}/>}
-                keyExtractor={(item) => item.id}
-            />
+            <SafeAreaView style={{flex: 1, width: '100%'}}>
+                <FlatList
+                    snapToAlignment="center"
+                    horizontal
+                    data={pairs}
+                    renderItem={({item}) => <VerticalPairOfStreams streams={item}/>}
+                    keyExtractor={(item) => item.id}
+                    showsHorizontalScrollIndicator
+                    pagingEnabled
+                />
+            </SafeAreaView>
+
         )
     }
 
@@ -66,7 +72,6 @@ export const VideoChat = ({myStream, remoteStreams, roomId}) => {
         }
     }
 
-    console.log(myStream);
     return (
         <View style={styles.container}>
             <View style={styles.roomCredits}>
@@ -90,19 +95,19 @@ const styles = StyleSheet.create({
         elevation: 10,
     },
     roomCredits: {
-        position: 'absolute',
-        top: 0,
+        // position: 'absolute',
+        // top: 0,
         backgroundColor: 'rgba(0, 0, 0, 0.3)',
         width: '100%',
         zIndex: 10,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingVertical: 16
+        paddingVertical: 10
     },
     roomTitle: {
-        fontSize: 32,
+        fontSize: 25,
         fontWeight: 'bold',
-        marginBottom: 8,
+        marginBottom: 5,
         color: 'white'
     },
     roomSubtitle: {

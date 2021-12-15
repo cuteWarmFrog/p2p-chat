@@ -1,21 +1,34 @@
 import React from "react";
 import CameraModule from "./CameraModule";
-import {View} from "react-native";
+import {View, StyleSheet} from "react-native";
+import window from '../constants/Layout';
 
 export const VerticalPairOfStreams = ({streams}) => {
-    const {up, down, id} = streams;
+    const {up, down, isMy = false} = streams;
+
     return (
-        <View style={{
-            flexDirection: 'column',
-            borderWidth: 3,
-            borderColor: 'yellow'
-        }}>
-            <View>
-                <CameraModule stream={up}/>
+        <View style={styles.container}>
+            <View style={styles.camera}>
+                <CameraModule isMy={isMy} stream={up}/>
             </View>
-            <View>
-                <CameraModule stream={down}/>
+            <View style={styles.camera}>
+                {down && <CameraModule stream={down}/>}
             </View>
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        borderWidth: 3,
+        borderColor: 'yellow',
+        width: window.window.width  / 2,
+        height: window.window.height - 150,
+
+    },
+
+    camera: {
+        flex: 1
+    }
+})
