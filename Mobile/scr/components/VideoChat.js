@@ -45,12 +45,11 @@ export const VideoChat = (
         )
     }
 
-    const renderStreamFullScreen = (stream) => {
-        console.log('renderStreamFullScreen');
+    const renderStreamFullScreen = useCallback((stream) => {
         return (
-            <CameraModule stream={stream}/>
+            <CameraModule style={styles.renderStreamFullScreen} stream={stream}/>
         )
-    }
+    }, [])
 
     const renderMultipleStreams = (myStream, remoteStreams) => {
         const pairs = [];
@@ -146,7 +145,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-
+    renderStreamFullScreen: {
+        flex: 1,
+        marginLeft: "-20%",
+    },
     cameras: {
         flex: 1
     },
@@ -208,8 +210,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-evenly',
         alignItems: 'center',
-
         borderColor: 'black',
         borderWidth: 3,
+        // Стили нужны, если устранить баг WebRTC
+        // borderRadius: 10,
+        // backgroundColor: 'rgba(0, 0, 0, 0.3)',
+        // overflow: 'hidden',
     }
 });
