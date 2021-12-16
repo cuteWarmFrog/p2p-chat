@@ -16,6 +16,9 @@ export const Chat = ({ route }) => {
     const [remoteStreams, setRemoteStreams] = useState([]);
     const [showControlButtons, setShowControlButtons] = useState(false);
 
+    const [isCamera, setIsCamera] = useState(false);
+    const [isMicro, setIsMicro] = useState(false);
+  
     const { roomId } = route.params;
 
     const joinRoom = useCallback((stream) => {
@@ -96,6 +99,20 @@ export const Chat = ({ route }) => {
         InCallManager.setForceSpeakerphoneOn(true);
         //InCallManager.startRingtone('DEFAULT');
     }
+    
+     const switchMicro = () => {
+        // myStream.getAudioTracks()[0].stop();
+       myStream.getAudioTracks()[0].enabled=isMicro;
+       setIsMicro(!isMicro);
+        // remoteStreams[0].getAudioTracks()[0].stop();
+    }
+
+    const switchCamera = () => {
+
+        myStream.getVideoTracks()[0].enabled = isCamera;
+        setIsCamera(!isCamera);
+        // TODO render something instead of video
+    }
 
     const onBodyClick = () => {
         setShowControlButtons(true);
@@ -103,7 +120,17 @@ export const Chat = ({ route }) => {
             setShowControlButtons(false);
         }, 2500)
     }
-
+     
+    const endCall = () => {
+        //todo please, end the call, guys
+    }
+    
+    const controlButtons = {
+        switchMicro,
+        switchCamera,
+        endCall
+    }
+    
     return (
         <TouchableOpacity
             activeOpacity={1}
@@ -114,7 +141,7 @@ export const Chat = ({ route }) => {
                     // remoteStreams={[myStream]}
                     remoteStreams={[...remoteStreams]}
                     roomId={roomId}
-                    showControlButtons={showControlButtons}
+                    conrolButtons={controlButtons}
                 />
         </TouchableOpacity>
     )
