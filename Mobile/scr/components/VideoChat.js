@@ -1,10 +1,10 @@
-import React, {useCallback} from 'react';
-import {FlatList, ScrollView, StyleSheet, Text, View} from 'react-native';
+import React, {useCallback, useState} from 'react';
+import {Button, FlatList, ScrollView, StyleSheet, Text, View} from 'react-native';
 import CameraModule from "./CameraModule";
 import {VerticalPairOfStreams} from "./VerticalPairOfStreams";
 import SafeAreaView from "react-native/Libraries/Components/SafeAreaView/SafeAreaView";
 
-export const VideoChat = ({myStream, remoteStreams, roomId}) => {
+export const VideoChat = ({inCallManager, myStream, remoteStreams, roomId}) => {
 
     const renderStream = (myStream, partnerStream) => {
         return (
@@ -55,6 +55,25 @@ export const VideoChat = ({myStream, remoteStreams, roomId}) => {
         )
     }
 
+    const [screenState, setScreenState] = useState(false);
+
+    const [microState, setMicroState] = useState(false);
+
+    const turnMicroOff = () => {
+
+        // myStream.getAudioTracks()[0].stop();
+       myStream.getAudioTracks()[0].enabled=microState;
+       setMicroState(!microState);
+        // remoteStreams[0].getAudioTracks()[0].stop();
+    }
+
+    const turnScreenOff = () => {
+
+        myStream.getVideoTracks()[0].enabled = screenState;
+        setScreenState(!screenState);
+        // TODO render something instead of video
+    }
+
     const renderChat = () => {
         if (!remoteStreams)
             return null;
@@ -78,6 +97,10 @@ export const VideoChat = ({myStream, remoteStreams, roomId}) => {
                 <Text style={styles.roomTitle}>
                     Your Room ID: {roomId}
                 </Text>
+                <Button title={"Turn screen"}
+                        onPress={turnScreenOff}/>
+                <Button title={"Turn micro"}
+                        onPress={turnMicroOff}/>
             </View>
             {myStream ? renderChat() : null}
         </View>

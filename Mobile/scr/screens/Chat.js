@@ -98,6 +98,7 @@ export const Chat = ({ route }) => {
 
     return (
         <VideoChat
+            inCallManager={InCallManager}
             myStream={myStream}
             remoteStreams={[...remoteStreams]}
             roomId={roomId}
