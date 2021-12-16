@@ -117,7 +117,8 @@ export const VideoChat = ({myStream, remoteStreams, roomId, showControlButtons})
         }
     }
 
-    console.log(isPartnerBig)
+    console.log(showControlButtons)
+
     return (
         <View style={styles.container}>
             <View style={styles.roomCredits}>
