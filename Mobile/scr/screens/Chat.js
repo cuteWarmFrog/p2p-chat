@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useCallback} from "react";
-import {View, Text, StyleSheet, Button} from "react-native";
+import { TouchableOpacity, TouchableWithoutFeedback } from "react-native";
 import IO from "socket.io-client";
 import {VideoChat} from '../components/VideoChat';
 
@@ -14,7 +14,11 @@ const URL = 'http://joeyke.ru:14050';
 export const Chat = ({ route }) => {
     const [myStream, setMyStream] = useState(null);
     const [remoteStreams, setRemoteStreams] = useState([]);
+    const [showControlButtons, setShowControlButtons] = useState(false);
 
+    const [isCamera, setIsCamera] = useState(false);
+    const [isMicro, setIsMicro] = useState(false);
+  
     const { roomId } = route.params;
 
     const joinRoom = useCallback((stream) => {
@@ -95,14 +99,51 @@ export const Chat = ({ route }) => {
         InCallManager.setForceSpeakerphoneOn(true);
         //InCallManager.startRingtone('DEFAULT');
     }
+    
+     const switchMicro = () => {
+        // myStream.getAudioTracks()[0].stop();
+       myStream.getAudioTracks()[0].enabled=isMicro;
+       setIsMicro(!isMicro);
+        // remoteStreams[0].getAudioTracks()[0].stop();
+    }
 
+    const switchCamera = () => {
+
+        myStream.getVideoTracks()[0].enabled = isCamera;
+        setIsCamera(!isCamera);
+        // TODO render something instead of video
+    }
+
+    const onBodyClick = () => {
+        setShowControlButtons(true);
+        setTimeout(() => {
+            setShowControlButtons(false);
+        }, 2500)
+    }
+     
+    const endCall = () => {
+        //todo please, end the call, guys
+    }
+    
+    const controlButtons = {
+        switchMicro,
+        switchCamera,
+        endCall
+    }
+    
     return (
-        <VideoChat
-            inCallManager={InCallManager}
-            myStream={myStream}
-            remoteStreams={[...remoteStreams]}
-            roomId={roomId}
-        />
+        <TouchableOpacity
+            activeOpacity={1}
+            onPress={onBodyClick}
+            style={{flex: 1}}>
+                <VideoChat
+                    myStream={myStream}
+                    // remoteStreams={[myStream]}
+                    remoteStreams={[...remoteStreams]}
+                    roomId={roomId}
+                    conrolButtons={controlButtons}
+                />
+        </TouchableOpacity>
     )
 }
 

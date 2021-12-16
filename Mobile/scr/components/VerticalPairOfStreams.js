@@ -4,12 +4,12 @@ import {View, StyleSheet} from "react-native";
 import window from '../constants/Layout';
 
 export const VerticalPairOfStreams = ({streams}) => {
-    const {up, down, isMy = false} = streams;
+    const { up, down } = streams;
 
     return (
         <View style={styles.container}>
             <View style={styles.camera}>
-                <CameraModule isMy={isMy} stream={up}/>
+                <CameraModule stream={up}/>
             </View>
             <View style={styles.camera}>
                 {down && <CameraModule stream={down}/>}
@@ -21,11 +21,8 @@ export const VerticalPairOfStreams = ({streams}) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        borderWidth: 3,
-        borderColor: 'yellow',
         width: window.window.width  / 2,
         height: window.window.height - 150,
-
     },
 
     camera: {

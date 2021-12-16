@@ -1,20 +1,38 @@
 import React, {useCallback, useState} from 'react';
-import {Button, FlatList, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {FlatList, ScrollView, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import CameraModule from "./CameraModule";
 import {VerticalPairOfStreams} from "./VerticalPairOfStreams";
-import SafeAreaView from "react-native/Libraries/Components/SafeAreaView/SafeAreaView";
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
-export const VideoChat = ({inCallManager, myStream, remoteStreams, roomId}) => {
+import {
+    faSyncAlt,
+    faVideo,
+    faMicrophoneAlt,
+    faMicrophoneAltSlash,
+    faTimesCircle
+    } from '@fortawesome/free-solid-svg-icons';
+
+export const VideoChat = ({myStream, remoteStreams, roomId, showControlButtons}) => {
+    const [isPartnerBig, setIsPartnerBig] = useState(true);
 
     const renderStream = (myStream, partnerStream) => {
         return (
             <>
-                <View style={styles.partnerCameraContainer}>
-                    <CameraModule stream={partnerStream}/>
+                <View style={styles.fullscreenCameraContainer}>
+                    {isPartnerBig ?
+                        (<CameraModule stream={partnerStream}/>) :
+                        <CameraModule stream={myStream}/>
+                    }
                 </View>
-                <View style={styles.myCameraContainer}>
-                    <CameraModule isMy stream={myStream}/>
-                </View>
+                <TouchableOpacity
+                    onPress={() => setIsPartnerBig(!isPartnerBig)}
+                    style={styles.smallCornerCameraContainer}
+                >
+                    {!isPartnerBig ?
+                        (<CameraModule stream={partnerStream}/>) :
+                        <CameraModule withSwitchButton stream={myStream}/>
+                    }
+                </TouchableOpacity>
             </>
         )
     }
@@ -22,7 +40,7 @@ export const VideoChat = ({inCallManager, myStream, remoteStreams, roomId}) => {
     const renderStreamFullScreen = (stream) => {
         console.log('renderStreamFullScreen');
         return (
-            <CameraModule isMy stream={stream}/>
+            <CameraModule stream={stream}/>
         )
     }
 
@@ -40,7 +58,6 @@ export const VideoChat = ({inCallManager, myStream, remoteStreams, roomId}) => {
         console.log(pairs.length);
 
         return (
-            <SafeAreaView style={{flex: 1, width: '100%'}}>
                 <FlatList
                     snapToAlignment="center"
                     horizontal
@@ -50,28 +67,7 @@ export const VideoChat = ({inCallManager, myStream, remoteStreams, roomId}) => {
                     showsHorizontalScrollIndicator
                     pagingEnabled
                 />
-            </SafeAreaView>
-
         )
-    }
-
-    const [screenState, setScreenState] = useState(false);
-
-    const [microState, setMicroState] = useState(false);
-
-    const turnMicroOff = () => {
-
-        // myStream.getAudioTracks()[0].stop();
-       myStream.getAudioTracks()[0].enabled=microState;
-       setMicroState(!microState);
-        // remoteStreams[0].getAudioTracks()[0].stop();
-    }
-
-    const turnScreenOff = () => {
-
-        myStream.getVideoTracks()[0].enabled = screenState;
-        setScreenState(!screenState);
-        // TODO render something instead of video
     }
 
     const renderChat = () => {
@@ -91,18 +87,48 @@ export const VideoChat = ({inCallManager, myStream, remoteStreams, roomId}) => {
         }
     }
 
+    const renderControlButtons = () => {
+        //todo Леша, тут нужен дизайн
+        if (showControlButtons) {
+            return (
+                <View style={styles.controlButtons}>
+                    <View>
+                        <TouchableOpacity>
+                            <FontAwesomeIcon icon={faSyncAlt} size={30}/>
+                        </TouchableOpacity>
+                    </View>
+                    <View>
+                        <TouchableOpacity>
+                            <FontAwesomeIcon icon={faMicrophoneAlt} size={30}/>
+                        </TouchableOpacity>
+                    </View>
+                    <View>
+                        <TouchableOpacity>
+                            <FontAwesomeIcon icon={faVideo} size={30}/>
+                        </TouchableOpacity>
+                    </View>
+                    <View>
+                        <TouchableOpacity>
+                            <FontAwesomeIcon icon={faTimesCircle} size={30}/>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            )
+        }
+    }
+
+    console.log(isPartnerBig)
     return (
         <View style={styles.container}>
             <View style={styles.roomCredits}>
                 <Text style={styles.roomTitle}>
                     Your Room ID: {roomId}
                 </Text>
-                <Button title={"Turn screen"}
-                        onPress={turnScreenOff}/>
-                <Button title={"Turn micro"}
-                        onPress={turnMicroOff}/>
             </View>
-            {myStream ? renderChat() : null}
+            <View style={styles.cameras}>
+                {myStream ? renderChat() : null}
+            </View>
+            {renderControlButtons()}
         </View>
     )
 }
@@ -113,25 +139,23 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    partnerCameraContainer: {
-        zIndex: 10,
-        elevation: 10,
+
+    cameras: {
+        flex: 1
     },
+
     roomCredits: {
-        // position: 'absolute',
-        // top: 0,
         backgroundColor: 'rgba(0, 0, 0, 0.3)',
         width: '100%',
         zIndex: 10,
-        justifyContent: 'center',
         alignItems: 'center',
-        paddingVertical: 10
+        padding: 5
     },
     roomTitle: {
         fontSize: 25,
-        fontWeight: 'bold',
+        fontWeight: '600',
         marginBottom: 5,
-        color: 'white'
+        color: 'black',
     },
     roomSubtitle: {
         fontSize: 24,
@@ -147,16 +171,38 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         width: '80%'
     },
-    myCameraContainer: {
+
+    fullscreenCameraContainer: {
+        zIndex: 10,
+        elevation: 10,
+    },
+
+    smallCornerCameraContainer: {
         zIndex: 1000,
         elevation: 1000,
         position: 'absolute',
-        bottom: 20,
-        left: 20,
+        top: 25,
+        right: 20,
         height: 180,
         width: 110,
         borderRadius: 10,
         backgroundColor: 'rgba(0, 0, 0, 0.3)',
-        overflow: 'hidden',
+    },
+
+    controlButtons: {
+        zIndex: 1000,
+        elevation: 1000,
+        backgroundColor: 'rgb(0,0,0,0.1)',
+        position: 'absolute',
+        bottom: 0,
+        width: '100%',
+        height: 80,
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+
+        borderColor: 'black',
+        borderWidth: 3,
     }
 });
