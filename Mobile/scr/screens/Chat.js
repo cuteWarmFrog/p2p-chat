@@ -18,10 +18,10 @@ export const Chat = ({ route }) => {
 
     const [isCamera, setIsCamera] = useState(false);
     const [isMicro, setIsMicro] = useState(false);
-  
+
     const { roomId } = route.params;
 
-    const joinRoom = useCallback((stream) => {
+    const joinRoom = useCallback((myStream) => {
 
         const connectToNewUser = (userId, stream) => {
             const call = peerServer.call(userId, stream);
@@ -45,7 +45,7 @@ export const Chat = ({ route }) => {
 
         peerServer.on('error', console.log);
 
-        setMyStream(stream);
+        setMyStream(myStream);
 
         peerServer.on('open', (userId) => {
             socket.emit('join-room', { userId, roomId });
@@ -53,7 +53,7 @@ export const Chat = ({ route }) => {
         })
 
         peerServer.on('call', (call) => {
-            call.answer(stream);
+            call.answer(myStream);
             InCallManager.start({media: 'video'}); //runtime call manager
             call.on('stream', (stream) => {
                 setRemoteStreams((remoteStreams) => remoteStreams.concat(stream));
@@ -61,7 +61,7 @@ export const Chat = ({ route }) => {
         })
 
         socket.on('user-connected', (userId) => {
-            connectToNewUser(userId, stream);
+            connectToNewUser(userId, myStream);
         })
     }, []);
 
@@ -99,7 +99,7 @@ export const Chat = ({ route }) => {
         InCallManager.setForceSpeakerphoneOn(true);
         //InCallManager.startRingtone('DEFAULT');
     }
-    
+
      const switchMicro = () => {
         // myStream.getAudioTracks()[0].stop();
        myStream.getAudioTracks()[0].enabled=isMicro;
@@ -115,22 +115,26 @@ export const Chat = ({ route }) => {
     }
 
     const onBodyClick = () => {
-        setShowControlButtons(true);
-        setTimeout(() => {
+        if(showControlButtons) {
             setShowControlButtons(false);
-        }, 2500)
+        } else {
+            setShowControlButtons(true);
+            setTimeout(() => {
+                setShowControlButtons(false);
+            }, 2500);
+        }
     }
-     
+
     const endCall = () => {
         //todo please, end the call, guys
     }
-    
+
     const controlButtons = {
         switchMicro,
         switchCamera,
         endCall
     }
-    
+
     return (
         <TouchableOpacity
             activeOpacity={1}
@@ -141,6 +145,7 @@ export const Chat = ({ route }) => {
                     // remoteStreams={[myStream]}
                     remoteStreams={[...remoteStreams]}
                     roomId={roomId}
+                    showControlButtons={showControlButtons}
                     conrolButtons={controlButtons}
                 />
         </TouchableOpacity>
