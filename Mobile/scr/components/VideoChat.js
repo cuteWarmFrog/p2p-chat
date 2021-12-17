@@ -1,5 +1,5 @@
 import React, {useCallback, useState} from 'react';
-import {FlatList, ScrollView, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import {FlatList, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import CameraModule from "./CameraModule";
 import {VerticalPairOfStreams} from "./VerticalPairOfStreams";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -12,7 +12,15 @@ import {
     faTimesCircle
     } from '@fortawesome/free-solid-svg-icons';
 
-export const VideoChat = ({myStream, remoteStreams, roomId, showControlButtons}) => {
+export const VideoChat = (
+    {
+        myStream,
+        remoteStreams,
+        roomId,
+        showControlButtons,
+        controlButtons
+    }) => {
+    const { switchMicro, switchCamera, endCall } = controlButtons;
     const [isPartnerBig, setIsPartnerBig] = useState(true);
 
     const renderStream = (myStream, partnerStream) => {
@@ -94,30 +102,28 @@ export const VideoChat = ({myStream, remoteStreams, roomId, showControlButtons})
                 <View style={styles.controlButtons}>
                     <View>
                         <TouchableOpacity>
-                            <FontAwesomeIcon icon={faSyncAlt} size={30}/>
+                            <FontAwesomeIcon icon={faSyncAlt} size={35}/>
                         </TouchableOpacity>
                     </View>
                     <View>
                         <TouchableOpacity>
-                            <FontAwesomeIcon icon={faMicrophoneAlt} size={30}/>
+                            <FontAwesomeIcon icon={faMicrophoneAlt} size={35}/>
                         </TouchableOpacity>
                     </View>
                     <View>
                         <TouchableOpacity>
-                            <FontAwesomeIcon icon={faVideo} size={30}/>
+                            <FontAwesomeIcon icon={faVideo} size={35}/>
                         </TouchableOpacity>
                     </View>
                     <View>
-                        <TouchableOpacity>
-                            <FontAwesomeIcon icon={faTimesCircle} size={30}/>
+                        <TouchableOpacity onPress={endCall}>
+                            <FontAwesomeIcon icon={faTimesCircle} size={35}/>
                         </TouchableOpacity>
                     </View>
                 </View>
             )
         }
     }
-
-    console.log(showControlButtons)
 
     return (
         <View style={styles.container}>

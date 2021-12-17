@@ -7,6 +7,10 @@ import { mediaDevices } from 'react-native-webrtc';
 
 import InCallManager from 'react-native-incall-manager';
 import Peer from 'react-native-peerjs';
+import { StackActions } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import {useRoute} from '@react-navigation/native';
+
 
 // const URL = 'http://172.28.76.96:6000';
 const URL = 'http://joeyke.ru:14050';
@@ -14,15 +18,21 @@ const URL = 'http://joeyke.ru:14050';
 export const Chat = ({ route }) => {
     const [myStream, setMyStream] = useState(null);
     const [remoteStreams, setRemoteStreams] = useState([]);
-    const [showControlButtons, setShowControlButtons] = useState(false);
 
+    const [showControlButtons, setShowControlButtons] = useState(false);
     const [isCamera, setIsCamera] = useState(false);
     const [isMicro, setIsMicro] = useState(false);
+
+    const [peer, setPeer] = useState(null);
+    const [timeOutToCloseButtons, setTimeOutToCloseButtons] = useState(null);
+
+    const popOnce = StackActions.pop(1);
+    const navigation = useNavigation();
+    const currentRoute = useRoute();
 
     const { roomId } = route.params;
 
     const joinRoom = useCallback((myStream) => {
-
         const connectToNewUser = (userId, stream) => {
             const call = peerServer.call(userId, stream);
             call.on('stream', (remoteVideoStream) => {
@@ -32,7 +42,7 @@ export const Chat = ({ route }) => {
             })
         }
 
-        const socket = IO(`${URL}`, {
+        const localSocket = IO(`${URL}`, {
             forceNew: true
         });
 
@@ -43,12 +53,14 @@ export const Chat = ({ route }) => {
             path: '/mypeer'
         });
 
+        setPeer(peerServer);
+
         peerServer.on('error', console.log);
 
         setMyStream(myStream);
 
         peerServer.on('open', (userId) => {
-            socket.emit('join-room', { userId, roomId });
+            localSocket.emit('join-room', { userId, roomId });
             console.log('join-room: ', userId, roomId);
         })
 
@@ -60,12 +72,14 @@ export const Chat = ({ route }) => {
             })
         })
 
-        socket.on('user-connected', (userId) => {
+        localSocket.on('user-connected', (userId) => {
             connectToNewUser(userId, myStream);
         })
+
     }, []);
 
     useEffect(() => {
+        console.log('in useEffect');
         let isFront = true;
         mediaDevices.enumerateDevices().then(sourceInfos => {
             console.log(sourceInfos);
@@ -119,14 +133,17 @@ export const Chat = ({ route }) => {
             setShowControlButtons(false);
         } else {
             setShowControlButtons(true);
-            setTimeout(() => {
+            const timeout = setTimeout(() => {
                 setShowControlButtons(false);
-            }, 2500);
+            }, 3000);
+            setTimeOutToCloseButtons(timeout);
         }
     }
 
     const endCall = () => {
-        //todo please, end the call, guys
+        clearTimeout(timeOutToCloseButtons);
+        peer.destroy();
+        navigation.dispatch(popOnce);
     }
 
     const controlButtons = {
@@ -146,7 +163,7 @@ export const Chat = ({ route }) => {
                     remoteStreams={[...remoteStreams]}
                     roomId={roomId}
                     showControlButtons={showControlButtons}
-                    conrolButtons={controlButtons}
+                    controlButtons={controlButtons}
                 />
         </TouchableOpacity>
     )
