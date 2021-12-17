@@ -9,8 +9,9 @@ import {
     faVideo,
     faMicrophoneAlt,
     faMicrophoneAltSlash,
-    faTimesCircle
+    faPhone
     } from '@fortawesome/free-solid-svg-icons';
+import ControlButton from "./ControlButton";
 
 export const VideoChat = (
     {
@@ -45,12 +46,11 @@ export const VideoChat = (
         )
     }
 
-    const renderStreamFullScreen = (stream) => {
-        console.log('renderStreamFullScreen');
+    const renderStreamFullScreen = useCallback((stream) => {
         return (
-            <CameraModule stream={stream}/>
+            <CameraModule style={styles.renderStreamFullScreen} stream={stream}/>
         )
-    }
+    }, [])
 
     const renderMultipleStreams = (myStream, remoteStreams) => {
         const pairs = [];
@@ -100,26 +100,10 @@ export const VideoChat = (
         if (showControlButtons) {
             return (
                 <View style={styles.controlButtons}>
-                    <View>
-                        <TouchableOpacity>
-                            <FontAwesomeIcon icon={faSyncAlt} size={35}/>
-                        </TouchableOpacity>
-                    </View>
-                    <View>
-                        <TouchableOpacity>
-                            <FontAwesomeIcon icon={faMicrophoneAlt} size={35}/>
-                        </TouchableOpacity>
-                    </View>
-                    <View>
-                        <TouchableOpacity>
-                            <FontAwesomeIcon icon={faVideo} size={35}/>
-                        </TouchableOpacity>
-                    </View>
-                    <View>
-                        <TouchableOpacity onPress={endCall}>
-                            <FontAwesomeIcon icon={faTimesCircle} size={35}/>
-                        </TouchableOpacity>
-                    </View>
+                    <ControlButton primaryIcon={faSyncAlt} onPress={switchCamera} />
+                    <ControlButton primaryIcon={faMicrophoneAlt} secondaryIcon={faMicrophoneAltSlash} onPress={switchMicro} />
+                    <ControlButton primaryIcon={faVideo} onPress={() => { console.log('Тут должна быть функция отруба видоса')}} />
+                    <ControlButton primaryIcon={faPhone} onPress={endCall} bgcolor={'rgba(180, 0, 0, 0.7)'} />
                 </View>
             )
         }
@@ -143,14 +127,14 @@ export const VideoChat = (
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
     },
-
+    renderStreamFullScreen: {
+        flex: 1,
+        marginLeft: "-20%",
+    },
     cameras: {
         flex: 1
     },
-
     roomCredits: {
         backgroundColor: 'rgba(0, 0, 0, 0.3)',
         width: '100%',
@@ -180,6 +164,7 @@ const styles = StyleSheet.create({
     },
 
     fullscreenCameraContainer: {
+        flex: 1,
         zIndex: 10,
         elevation: 10,
     },
@@ -199,17 +184,14 @@ const styles = StyleSheet.create({
     controlButtons: {
         zIndex: 1000,
         elevation: 1000,
-        backgroundColor: 'rgb(0,0,0,0.1)',
         position: 'absolute',
-        bottom: 0,
+        bottom: 15,
         width: '100%',
         height: 80,
         flex: 1,
         flexDirection: 'row',
         justifyContent: 'space-evenly',
         alignItems: 'center',
-
         borderColor: 'black',
-        borderWidth: 3,
     }
 });
