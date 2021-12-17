@@ -108,23 +108,14 @@ export const Chat = ({ route }) => {
         });
     }, [])
 
-    const speakerphoneHandler = () => {
-        InCallManager.setForceSpeakerphoneOn(true);
-        //InCallManager.startRingtone('DEFAULT');
-    }
-
-     const switchMicro = () => {
-        // myStream.getAudioTracks()[0].stop();
+     const toggleMicro = () => {
        myStream.getAudioTracks()[0].enabled=isMicro;
        setIsMicro(!isMicro);
-        // remoteStreams[0].getAudioTracks()[0].stop();
     }
 
-    const switchCamera = () => {
-
+    const toggleCamera = () => {
         myStream.getVideoTracks()[0].enabled = isCamera;
         setIsCamera(!isCamera);
-        // TODO render something instead of video
     }
 
     const onBodyClick = () => {
@@ -146,8 +137,8 @@ export const Chat = ({ route }) => {
     }
 
     const controlButtons = {
-        switchMicro,
-        switchCamera,
+        toggleMicro,
+        toggleCamera,
         endCall
     }
 
