@@ -118,6 +118,12 @@ export const Chat = ({ route }) => {
         setIsCamera(!isCamera);
     }
 
+    const switchCameraView = () => {
+        myStream.getVideoTracks().forEach( (track) => {
+            track._switchCamera();
+        })
+    }
+
     const onBodyClick = () => {
         if(showControlButtons) {
             setShowControlButtons(false);
@@ -139,6 +145,7 @@ export const Chat = ({ route }) => {
     const controlButtons = {
         toggleMicro,
         toggleCamera,
+        switchCameraView,
         endCall
     }
 
