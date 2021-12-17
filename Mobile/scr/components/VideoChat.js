@@ -102,7 +102,7 @@ export const VideoChat = (
                 <View style={styles.controlButtons}>
                     <ControlButton primaryIcon={faSyncAlt} onPress={switchCamera} />
                     <ControlButton primaryIcon={faMicrophoneAlt} secondaryIcon={faMicrophoneAltSlash} onPress={switchMicro} />
-                    <ControlButton primaryIcon={faVideo} onPress={() => { console.log('Тут должна быть функция отруба видоса')}} />
+                    <ControlButton primaryIcon={faVideo} onPress={switchCamera} />
                     <ControlButton primaryIcon={faPhone} onPress={endCall} bgcolor={'rgba(180, 0, 0, 0.7)'} />
                 </View>
             )
