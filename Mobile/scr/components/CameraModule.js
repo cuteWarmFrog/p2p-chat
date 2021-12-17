@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
     StyleSheet,
     View,
@@ -17,7 +17,7 @@ export default function CameraModule(props) {
 
     console.log(stream.getVideoTracks);
 
-    const renderStream = () => {
+    const renderStream = useCallback(() => {
         console.log('streamEnable:', stream.getVideoTracks()[0].enabled);
         if(stream.getVideoTracks()[0].enabled) {
             return <RTCView style={styles.camera} streamURL={stream.toURL()} />
@@ -28,7 +28,7 @@ export default function CameraModule(props) {
                 source={{uri: DEFAULT_IMAGE}}
             />
         )
-    }
+    }, [stream]);
 
     return (
         <View style={styles.camera}>
