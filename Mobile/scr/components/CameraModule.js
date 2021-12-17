@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-    Platform,
     StyleSheet,
     View
 } from 'react-native';
@@ -28,5 +27,4 @@ const styles = StyleSheet.create({
         marginLeft: "-10%",
 
     },
-
 });
