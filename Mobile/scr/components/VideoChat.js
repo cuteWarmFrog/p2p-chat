@@ -24,7 +24,7 @@ export const VideoChat = (
     const { switchMicro, switchCamera, endCall } = controlButtons;
     const [isPartnerBig, setIsPartnerBig] = useState(true);
 
-    const renderStream = (myStream, partnerStream) => {
+    const renderStream = useCallback((myStream, partnerStream) => {
         return (
             <>
                 <View style={styles.fullscreenCameraContainer}>
@@ -44,7 +44,7 @@ export const VideoChat = (
                 </TouchableOpacity>
             </>
         )
-    }
+    }, [isPartnerBig, setIsPartnerBig]);
 
     const renderStreamFullScreen = useCallback((stream) => {
         return (
@@ -52,7 +52,7 @@ export const VideoChat = (
         )
     }, [])
 
-    const renderMultipleStreams = (myStream, remoteStreams) => {
+    const renderMultipleStreams = useCallback((myStream, remoteStreams) => {
         const pairs = [];
         const streams = [myStream, ...remoteStreams];
         for(let i = 0; i < streams.length; i += 2) {
@@ -76,9 +76,9 @@ export const VideoChat = (
                     pagingEnabled
                 />
         )
-    }
+    }, []);
 
-    const renderChat = () => {
+    const renderChat = useCallback(() => {
         if (!remoteStreams)
             return null;
 
@@ -93,21 +93,20 @@ export const VideoChat = (
         if (remoteStreams.length > 1) {
             return renderMultipleStreams(myStream, remoteStreams);
         }
-    }
+    },[myStream, remoteStreams]);
 
-    const renderControlButtons = () => {
-        //todo Леша, тут нужен дизайн
+    const renderControlButtons = useCallback(() => {
         if (showControlButtons) {
             return (
                 <View style={styles.controlButtons}>
-                    <ControlButton primaryIcon={faSyncAlt} onPress={switchCamera} />
+                    <ControlButton primaryIcon={faSyncAlt} onPress={() => console.log('поворот камеры')} />
                     <ControlButton primaryIcon={faMicrophoneAlt} secondaryIcon={faMicrophoneAltSlash} onPress={switchMicro} />
                     <ControlButton primaryIcon={faVideo} onPress={switchCamera} />
                     <ControlButton primaryIcon={faPhone} onPress={endCall} bgcolor={'rgba(180, 0, 0, 0.7)'} />
                 </View>
             )
         }
-    }
+    }, [switchCamera, switchMicro, endCall, showControlButtons]);
 
     return (
         <View style={styles.container}>

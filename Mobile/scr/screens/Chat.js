@@ -158,8 +158,8 @@ export const Chat = ({ route }) => {
             style={{flex: 1}}>
                 <VideoChat
                     myStream={myStream}
-                    // remoteStreams={[myStream]}
-                    remoteStreams={[...remoteStreams]}
+                    remoteStreams={[myStream, myStream, myStream, myStream]}
+                    // remoteStreams={[...remoteStreams]}
                     roomId={roomId}
                     showControlButtons={showControlButtons}
                     controlButtons={controlButtons}
