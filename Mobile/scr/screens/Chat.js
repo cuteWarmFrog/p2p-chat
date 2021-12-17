@@ -28,7 +28,6 @@ export const Chat = ({ route }) => {
 
     const popOnce = StackActions.pop(1);
     const navigation = useNavigation();
-    const currentRoute = useRoute();
 
     const { roomId } = route.params;
 
