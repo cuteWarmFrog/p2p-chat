@@ -21,7 +21,7 @@ export const VideoChat = (
         showControlButtons,
         controlButtons
     }) => {
-    const { switchMicro, switchCamera, endCall } = controlButtons;
+    const { toggleMicro, toggleCamera, endCall } = controlButtons;
     const [isPartnerBig, setIsPartnerBig] = useState(true);
 
     const renderStream = useCallback((myStream, partnerStream) => {
@@ -100,13 +100,13 @@ export const VideoChat = (
             return (
                 <View style={styles.controlButtons}>
                     <ControlButton primaryIcon={faSyncAlt} onPress={() => console.log('поворот камеры')} />
-                    <ControlButton primaryIcon={faMicrophoneAlt} secondaryIcon={faMicrophoneAltSlash} onPress={switchMicro} />
-                    <ControlButton primaryIcon={faVideo} onPress={switchCamera} />
+                    <ControlButton primaryIcon={faMicrophoneAlt} secondaryIcon={faMicrophoneAltSlash} onPress={toggleMicro} />
+                    <ControlButton primaryIcon={faVideo} onPress={toggleCamera} />
                     <ControlButton primaryIcon={faPhone} onPress={endCall} bgcolor={'rgba(180, 0, 0, 0.7)'} />
                 </View>
             )
         }
-    }, [switchCamera, switchMicro, endCall, showControlButtons]);
+    }, [toggleCamera, toggleMicro, endCall, showControlButtons]);
 
     return (
         <View style={styles.container}>
