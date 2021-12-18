@@ -42,6 +42,16 @@ export const Chat = ({ route }) => {
 
     const joinRoom = useCallback((myStream) => {
 
+        const connectToNewUser = (userId, stream) => {
+            const call = peer.call(userId, stream); // creating call-room here
+            // stream event again here
+            call.on('stream', (remoteVideoStream) => {
+                if (remoteVideoStream) {
+                    setRemoteStreams((remoteStreams) => remoteStreams.concat(remoteVideoStream))
+                }
+            })
+        }
+
         const localSocket = IO(`${URL}`, {
             forceNew: true
         });
@@ -53,40 +63,34 @@ export const Chat = ({ route }) => {
             path: '/mypeer'
         });
 
-
         setPeer(peerServer);
 
         peerServer.on('error', console.log);
 
         setMyStream(myStream);
 
-        const configuration = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
-        const pc = new RTCPeerConnection(configuration);
-
-        const connectToNewUser = (userId, stream) => {
-            const call = peer.call(userId, stream);
-            call.on('stream', (remoteVideoStream) => {
-                if (remoteVideoStream) {
-                    setRemoteStreams((remoteStreams) => remoteStreams.concat(remoteVideoStream))
-                }
-            })
-        }
-
         peerServer.on('open', (userId) => {
+            // sending signal to server, on which
+            // it will answer with room-joining and that roomId
             localSocket.emit('join-room', { userId, roomId });
+            console.log('join-room: ', userId, roomId);
         })
 
-        // when we are joining the another room
         peerServer.on('call', (call) => {
+            // answering call here, and then subscribing to
+            // 'stream' event that will trigger new participants screens rendering
             call.answer(myStream);
+            InCallManager.start({media: 'video'}); //runtime call manager
+            call.on('stream', (stream) => {
+                setRemoteStreams((remoteStreams) => remoteStreams.concat(stream));
+            })
         })
 
-
-        // reaction on server's socket with userId, that room is joined
         localSocket.on('user-connected', (userId) => {
+            // after server transfer user id, try to connect to
+            // new room
             connectToNewUser(userId, myStream);
         })
-
 
     }, []);
 

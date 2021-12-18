@@ -12,21 +12,15 @@ import {RTCView} from "react-native-webrtc";
 
 export default function CameraModule(props) {
     const [hasPermission, setHasPermission] = useState(null);
-    // const [type, setType] = useState(Camera.Constants.Type.front);
     const { stream } = props;
 
-    console.log(stream.getVideoTracks);
-
     const renderStream = useCallback(() => {
-        console.log('streamEnable:', stream.getVideoTracks()[0].enabled);
         if(stream.getVideoTracks()[0].enabled) {
             return <RTCView style={styles.camera} streamURL={stream.toURL()} />
         }
         return (
-            <Image
-                style={styles.img}
-                source={{uri: DEFAULT_IMAGE}}
-            />
+            // return static image here in case of turned off camera
+        <RTCView style={styles.camera} streamURL={DEFAULT_IMAGE} />
         )
     }, [stream]);
 
@@ -39,8 +33,6 @@ export default function CameraModule(props) {
 
 const styles = StyleSheet.create({
     camera: {
-        // flex: Platform.OS === 'ios' ? 1 : 0,
-        // height: Platform.OS === 'ios' ? 'auto' : '100%',
         flex: 1,
         width: '120%',
         marginLeft: "-10%",
