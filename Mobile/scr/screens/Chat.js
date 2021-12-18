@@ -64,6 +64,17 @@ export const Chat = ({ route }) => {
         const pc = new RTCPeerConnection(configuration);
 
         pc.onicecandidate = e => pc.addIceCandidate(e.candidate);
+
+        const connectToNewUser = (userId, stream) => {
+            const call = peer.call(userId, stream);
+            call.on('stream', (remoteVideoStream) => {
+                pc.addStream(remoteVideoStream);
+                if (remoteVideoStream) {
+                    setRemoteStreams((remoteStreams) => remoteStreams.concat(remoteVideoStream))
+                }
+            })
+        }
+
         pc.addTransceiver(myStream.getVideoTracks()[0], {
             direction: "sendonly",
             streams: [myStream],
@@ -87,18 +98,13 @@ export const Chat = ({ route }) => {
             call.answer(myStream);
         })
 
-        peerServer.on('stream', (remoteVideoStream) => {
-            if (remoteVideoStream) {
-                setRemoteStreams((remoteStreams) => remoteStreams.concat(remoteVideoStream))
-            }
-        })
 
         // reaction on server's socket with userId, that room is joined
         localSocket.on('user-connected', (userId) => {
             let offer = pc.createOffer();
             pc.setLocalDescription(offer);
             pc.setRemoteDescription(offer);
-            peer.call(userId, myStream);
+            connectToNewUser(userId, myStream);
         })
 
 
