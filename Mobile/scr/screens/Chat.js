@@ -9,10 +9,9 @@ import InCallManager from 'react-native-incall-manager';
 import Peer from 'react-native-peerjs';
 import { StackActions } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
+import VIForegroundService from '@voximplant/react-native-foreground-service';
 import {useRoute} from '@react-navigation/native';
 
-
-// const URL = 'http://172.28.76.96:6000';
 const URL = 'http://joeyke.ru:14050';
 
 export const Chat = ({ route }) => {
@@ -24,6 +23,7 @@ export const Chat = ({ route }) => {
     const [isMicro, setIsMicro] = useState(false);
 
     const [peer, setPeer] = useState(null);
+
     const [timeOutToCloseButtons, setTimeOutToCloseButtons] = useState(null);
 
     const popOnce = StackActions.pop(1);
@@ -32,8 +32,11 @@ export const Chat = ({ route }) => {
     const { roomId } = route.params;
 
     const joinRoom = useCallback((myStream) => {
+
         const connectToNewUser = (userId, stream) => {
             const call = peerServer.call(userId, stream);
+            // creating call-room here
+            // stream event again here
             call.on('stream', (remoteVideoStream) => {
                 if (remoteVideoStream) {
                     setRemoteStreams((remoteStreams) => remoteStreams.concat(remoteVideoStream))
@@ -59,12 +62,16 @@ export const Chat = ({ route }) => {
         setMyStream(myStream);
 
         peerServer.on('open', (userId) => {
+            // sending signal to server, on which
+            // it will answer with room-joining and that roomId
             localSocket.emit('join-room', { userId, roomId });
             console.log('join-room: ', userId, roomId);
         })
 
         peerServer.on('call', (call) => {
             call.answer(myStream);
+            // answering call here, and then subscribing to
+            // 'stream' event that will trigger new participants screens rendering
             InCallManager.start({media: 'video'}); //runtime call manager
             call.on('stream', (stream) => {
                 setRemoteStreams((remoteStreams) => remoteStreams.concat(stream));
@@ -72,12 +79,41 @@ export const Chat = ({ route }) => {
         })
 
         localSocket.on('user-connected', (userId) => {
+            // after server transfer user id, try to connect to
+            // new room
             connectToNewUser(userId, myStream);
         })
 
     }, []);
 
     useEffect(() => {
+
+        async function startForegroundService() {
+
+            const channelConfig = {
+                id: 'channelId',
+                name: 'Channel name',
+                description: 'Channel description',
+                enableVibration: false
+            };
+
+            const notificationConfig = {
+                channelId: 'channelId',
+                id: 3456,
+                title: 'Title',
+                text: 'Some text',
+                icon: 'ic_icon'
+            };
+            try {
+                await VIForegroundService.createNotificationChannel(channelConfig);
+                await VIForegroundService.startService(notificationConfig);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        startForegroundService().then(r => {console.log('back service is running')});
+
         console.log('in useEffect');
         let isFront = true;
         mediaDevices.enumerateDevices().then(sourceInfos => {
@@ -96,6 +132,11 @@ export const Chat = ({ route }) => {
                     height: 480,
                     frameRate: 30,
                     facingMode: (isFront ? "user" : "environment"),
+                    sendEncodings: [
+                        { rid: "h", maxBitrate: 1200 * 1024 },
+                        { rid: "m", maxBitrate:  600 * 1024, scaleResolutionDownBy: 2 },
+                        { rid: "l", maxBitrate:  300 * 1024, scaleResolutionDownBy: 4 }
+                    ],
                     deviceId: videoSourceId
                 }
             }, [])
@@ -156,8 +197,8 @@ export const Chat = ({ route }) => {
             style={{flex: 1}}>
                 <VideoChat
                     myStream={myStream}
-                    remoteStreams={[myStream, myStream, myStream, myStream]}
-                    // remoteStreams={[...remoteStreams]}
+                    //remoteStreams={[myStream, myStream, myStream, myStream]}
+                    remoteStreams={[...remoteStreams]}
                     roomId={roomId}
                     showControlButtons={showControlButtons}
                     controlButtons={controlButtons}
