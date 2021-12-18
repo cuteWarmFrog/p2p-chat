@@ -15,10 +15,7 @@ export default function CameraModule(props) {
     // const [type, setType] = useState(Camera.Constants.Type.front);
     const { stream } = props;
 
-    console.log(stream.getVideoTracks);
-
-    const renderStream = useCallback(() => {
-        console.log('streamEnable:', stream.getVideoTracks()[0].enabled);
+    const renderStream = useCallback((stream) => {
         if(stream.getVideoTracks()[0].enabled) {
             return <RTCView style={styles.camera} streamURL={stream.toURL()} />
         }
@@ -28,11 +25,11 @@ export default function CameraModule(props) {
                 source={{uri: DEFAULT_IMAGE}}
             />
         )
-    }, [stream]);
+    }, []);
 
     return (
         <View style={styles.camera}>
-            {renderStream()}
+            {renderStream(stream)}
         </View>
     );
 }

@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useCallback} from "react";
-import { TouchableOpacity, TouchableWithoutFeedback } from "react-native";
+import { TouchableOpacity } from "react-native";
 import IO from "socket.io-client";
 import {VideoChat} from '../components/VideoChat';
 
@@ -156,8 +156,8 @@ export const Chat = ({ route }) => {
             style={{flex: 1}}>
                 <VideoChat
                     myStream={myStream}
-                    remoteStreams={[myStream, myStream, myStream, myStream]}
-                    // remoteStreams={[...remoteStreams]}
+                    // remoteStreams={[myStream, myStream, myStream, myStream]}
+                    remoteStreams={[...remoteStreams]}
                     roomId={roomId}
                     showControlButtons={showControlButtons}
                     controlButtons={controlButtons}
