@@ -63,27 +63,14 @@ export const Chat = ({ route }) => {
         const configuration = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
         const pc = new RTCPeerConnection(configuration);
 
-        pc.onicecandidate = e => pc.addIceCandidate(e.candidate);
-
         const connectToNewUser = (userId, stream) => {
             const call = peer.call(userId, stream);
             call.on('stream', (remoteVideoStream) => {
-                pc.addStream(remoteVideoStream);
                 if (remoteVideoStream) {
                     setRemoteStreams((remoteStreams) => remoteStreams.concat(remoteVideoStream))
                 }
             })
         }
-
-        pc.addTransceiver(myStream.getVideoTracks()[0], {
-            direction: "sendonly",
-            streams: [myStream],
-            sendEncodings: [
-                { rid: "h", maxBitrate: 1200 * 1024 },
-                { rid: "m", maxBitrate:  600 * 1024, scaleResolutionDownBy: 2 },
-                { rid: "l", maxBitrate:  300 * 1024, scaleResolutionDownBy: 4 }
-            ]
-        });
 
         peerServer.on('open', (userId) => {
             localSocket.emit('join-room', { userId, roomId });
@@ -91,19 +78,12 @@ export const Chat = ({ route }) => {
 
         // when we are joining the another room
         peerServer.on('call', (call) => {
-            let answer = pc.createAnswer();
-            pc.setLocalDescription(answer);
-            pc.setRemoteDescription(answer);
-            pc.addStream(myStream);
             call.answer(myStream);
         })
 
 
         // reaction on server's socket with userId, that room is joined
         localSocket.on('user-connected', (userId) => {
-            let offer = pc.createOffer();
-            pc.setLocalDescription(offer);
-            pc.setRemoteDescription(offer);
             connectToNewUser(userId, myStream);
         })
 
