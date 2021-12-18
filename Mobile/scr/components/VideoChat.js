@@ -164,12 +164,12 @@ const styles = StyleSheet.create({
 
     fullscreenCameraContainer: {
         flex: 1,
-        zIndex: 10,
+        zIndex: 1000,
         elevation: 10,
     },
 
     smallCornerCameraContainer: {
-        zIndex: 1000,
+        zIndex: 10,
         elevation: 1000,
         position: 'absolute',
         top: 25,
