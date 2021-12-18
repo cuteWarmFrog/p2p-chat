@@ -3,7 +3,16 @@ import { TouchableOpacity, TouchableWithoutFeedback } from "react-native";
 import IO from "socket.io-client";
 import {VideoChat} from '../components/VideoChat';
 
-import { mediaDevices } from 'react-native-webrtc';
+import {
+    RTCPeerConnection,
+    RTCIceCandidate,
+    RTCSessionDescription,
+    RTCView,
+    MediaStream,
+    MediaStreamTrack,
+    mediaDevices,
+    registerGlobals
+} from 'react-native-webrtc';
 
 import InCallManager from 'react-native-incall-manager';
 import Peer from 'react-native-peerjs';
@@ -32,14 +41,6 @@ export const Chat = ({ route }) => {
     const { roomId } = route.params;
 
     const joinRoom = useCallback((myStream) => {
-        const connectToNewUser = (userId, stream) => {
-            const call = peerServer.call(userId, stream);
-            call.on('stream', (remoteVideoStream) => {
-                if (remoteVideoStream) {
-                    setRemoteStreams((remoteStreams) => remoteStreams.concat(remoteVideoStream))
-                }
-            })
-        }
 
         const localSocket = IO(`${URL}`, {
             forceNew: true
@@ -52,33 +53,58 @@ export const Chat = ({ route }) => {
             path: '/mypeer'
         });
 
+
         setPeer(peerServer);
 
         peerServer.on('error', console.log);
 
         setMyStream(myStream);
 
+        const configuration = {"iceServers": [{"url": "stun:stun.l.google.com:19302"}]};
+        const pc = new RTCPeerConnection(configuration);
+
+        pc.onicecandidate = e => pc.addIceCandidate(e.candidate);
+        pc.addTransceiver(myStream.getVideoTracks()[0], {
+            direction: "sendonly",
+            streams: [myStream],
+            sendEncodings: [
+                { rid: "h", maxBitrate: 1200 * 1024 },
+                { rid: "m", maxBitrate:  600 * 1024, scaleResolutionDownBy: 2 },
+                { rid: "l", maxBitrate:  300 * 1024, scaleResolutionDownBy: 4 }
+            ]
+        });
+
         peerServer.on('open', (userId) => {
             localSocket.emit('join-room', { userId, roomId });
-            console.log('join-room: ', userId, roomId);
         })
 
+        // when we are joining the another room
         peerServer.on('call', (call) => {
+            let answer = pc.createAnswer();
+            pc.setLocalDescription(answer);
+            pc.setRemoteDescription(answer);
+            pc.addStream(myStream);
             call.answer(myStream);
-            InCallManager.start({media: 'video'}); //runtime call manager
-            call.on('stream', (stream) => {
-                setRemoteStreams((remoteStreams) => remoteStreams.concat(stream));
-            })
         })
 
-        localSocket.on('user-connected', (userId) => {
-            connectToNewUser(userId, myStream);
+        peerServer.on('stream', (remoteVideoStream) => {
+            if (remoteVideoStream) {
+                setRemoteStreams((remoteStreams) => remoteStreams.concat(remoteVideoStream))
+            }
         })
+
+        // reaction on server's socket with userId, that room is joined
+        localSocket.on('user-connected', (userId) => {
+            let offer = pc.createOffer();
+            pc.setLocalDescription(offer);
+            pc.setRemoteDescription(offer);
+            peer.call(userId, myStream);
+        })
+
 
     }, []);
 
     useEffect(() => {
-        console.log('in useEffect');
         let isFront = true;
         mediaDevices.enumerateDevices().then(sourceInfos => {
             console.log(sourceInfos);
@@ -94,8 +120,13 @@ export const Chat = ({ route }) => {
                 video: {
                     width: 640,
                     height: 480,
-                    frameRate: 30,
+                    frameRate: 100,
                     facingMode: (isFront ? "user" : "environment"),
+                    sendEncodings: [
+                        { rid: "h", maxBitrate: 1200 * 1024 },
+                        { rid: "m", maxBitrate:  600 * 1024, scaleResolutionDownBy: 2 },
+                        { rid: "l", maxBitrate:  300 * 1024, scaleResolutionDownBy: 4 }
+                    ],
                     deviceId: videoSourceId
                 }
             }, [])
@@ -106,6 +137,7 @@ export const Chat = ({ route }) => {
                     console.log(error)
                 });
         });
+
     }, [])
 
      const toggleMicro = () => {
@@ -156,8 +188,8 @@ export const Chat = ({ route }) => {
             style={{flex: 1}}>
                 <VideoChat
                     myStream={myStream}
-                    remoteStreams={[myStream, myStream, myStream, myStream]}
-                    // remoteStreams={[...remoteStreams]}
+                    //remoteStreams={[myStream, myStream, myStream, myStream]}
+                    remoteStreams={[...remoteStreams]}
                     roomId={roomId}
                     showControlButtons={showControlButtons}
                     controlButtons={controlButtons}
