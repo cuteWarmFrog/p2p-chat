@@ -18,6 +18,7 @@
     "@voximplant/react-native-foreground-service": "^2.0.0",
     "react": "17.0.2",
     "react-native": "0.66.3",
+    "react-native-background-timer": "^2.4.1",
     "react-native-gesture-handler": "^2.1.0",
     "react-native-incall-manager": "^3.3.0",
     "react-native-peerjs": "^1.0.4",
