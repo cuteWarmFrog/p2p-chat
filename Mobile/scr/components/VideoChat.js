@@ -37,8 +37,8 @@ export const VideoChat = (
                         onPress={() => setIsPartnerBig(!isPartnerBig)}
                     >
                         {!isPartnerBig ?
-                            <CameraModule stream={partnerStream} /> :
-                            <CameraModule withSwitchButton stream={myStream} />
+                            <CameraModule zOrder={10} stream={partnerStream} /> :
+                            <CameraModule zOrder={10} withSwitchButton stream={myStream} />
                         }
                     </TouchableHighlight>
                 </View>
