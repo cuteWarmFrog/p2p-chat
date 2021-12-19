@@ -9,11 +9,11 @@ import InCallManager from 'react-native-incall-manager';
 import Peer from 'react-native-peerjs';
 import { StackActions } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
+
+import { URL } from '../utils/urls';
+import {getFcmToken} from "../utils/firebase";
 import VIForegroundService from '@voximplant/react-native-foreground-service';
 import BackgroundTimer from 'react-native-background-timer';
-import {useRoute} from '@react-navigation/native';
-
-const URL = 'http://joeyke.ru:14050';
 
 export const Chat = ({ route }) => {
     //BackgroundTimer.runBackgroundTimer( () => {
@@ -65,10 +65,12 @@ export const Chat = ({ route }) => {
 
         setMyStream(myStream);
 
-        peerServer.on('open', (userId) => {
+        peerServer.on('open', async (userId) => {
             // sending signal to server, on which
             // it will answer with room-joining and that roomId
-            localSocket.emit('join-room', {userId, roomId});
+            const token = await getFcmToken();
+            localSocket.emit('join-room', { userId, roomId, token });
+          
             console.log('join-room: ', userId, roomId);
         })
 
