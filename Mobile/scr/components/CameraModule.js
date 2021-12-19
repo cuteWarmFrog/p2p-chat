@@ -20,7 +20,7 @@ export default function CameraModule(props) {
         return (
             <View style={styles.noImage}>
                 <Text>
-                    No image
+                    No source image
                 </Text>
             </View>
         )
@@ -36,8 +36,6 @@ export default function CameraModule(props) {
 
 const styles = StyleSheet.create({
     camera: {
-        // flex: Platform.OS === 'ios' ? 1 : 0,
-        // height: Platform.OS === 'ios' ? 'auto' : '100%',
         flex: 1,
         width: '120%',
         marginLeft: "-10%",

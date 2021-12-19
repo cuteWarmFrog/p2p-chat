@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
     FlatList,
     StyleSheet,
@@ -24,7 +24,8 @@ export const VideoChat = (
         remoteStreams,
         roomId,
         showControlButtons,
-        controlButtons
+        controlButtons,
+        setRemoteStreams
     }) => {
     const { toggleMicro, toggleCamera, endCall, switchCameraView } = controlButtons;
     const [isPartnerBig, setIsPartnerBig] = useState(true);
@@ -100,6 +101,19 @@ export const VideoChat = (
             return renderMultipleStreams(myStream, remoteStreams);
         }
     },[myStream, remoteStreams]);
+
+    // removing null streams
+    useEffect(() => {
+        remoteStreams.forEach((track, index) => {
+            track.getVideoTracks().forEach(t=> {
+                    if (!t){
+                        let arrayStream = [...remoteStreams];
+                        setRemoteStreams(arrayStream.slice(index,1))
+                    }
+                }
+            )
+        })
+    }, [myStream, remoteStreams]);
 
     const renderControlButtons = useCallback(() => {
         if (showControlButtons) {

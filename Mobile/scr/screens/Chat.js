@@ -9,6 +9,9 @@ import InCallManager from 'react-native-incall-manager';
 import Peer from 'react-native-peerjs';
 import { StackActions } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
+import VIForegroundService from '@voximplant/react-native-foreground-service';
+import {useRoute} from '@react-navigation/native';
+import {useForceUpdate} from "../hooks/useForceUpdate";
 
 import { URL } from '../utils/urls';
 import {getFcmToken} from "../utils/firebase";
@@ -21,16 +24,14 @@ export const Chat = ({ route }) => {
     const [isCamera, setIsCamera] = useState(false);
     const [isMicro, setIsMicro] = useState(false);
 
-    //const [lastRoom]
-
     const [peer, setPeer] = useState(null);
+    const forceUpdate = useForceUpdate();
 
     const [timeOutToCloseButtons, setTimeOutToCloseButtons] = useState(null);
 
     const popOnce = StackActions.pop(1);
     const navigation = useNavigation();
-
-    const { roomId, login } = route.params;
+    const { roomId, login, setLastConnectedRoom:setLastConnectedRoom } = route.params;
 
     const joinRoom = useCallback((myStream) => {
 
@@ -63,14 +64,13 @@ export const Chat = ({ route }) => {
         setMyStream(myStream);
 
         peerServer.on('open', async (userId) => {
-            console.log('in peerSocket open');
             // sending signal to server, on which
             // it will answer with room-joining and that roomId
+         
             const token = await getFcmToken();
             console.log(token);
             localSocket.emit('join-room', { userId, roomId });
-            console.log('after join-room');
-
+            setLastConnectedRoom(roomId);
             console.log('join-room: ', userId, roomId);
         })
 
@@ -93,16 +93,43 @@ export const Chat = ({ route }) => {
     }, []);
 
     useEffect(() => {
-       // startForegroundService().then(r => {console.log('back service is running')});
+        // background daemon to keep connection alive
+        // after disconnect
+        async function startForegroundService() {
+
+            const channelConfig = {
+                id: 'channelId',
+                name: 'Messenger notifications',
+                description: 'Channel description',
+                enableVibration: false
+            };
+
+            const notificationConfig = {
+                channelId: 'channelId',
+                id: 3456,
+                title: 'P2P messenger',
+                text: 'App is running in background',
+                icon: 'ic_icon'
+            };
+            try {
+                await VIForegroundService.createNotificationChannel(channelConfig);
+                await VIForegroundService.startService(notificationConfig);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        startForegroundService().then(r => {console.log('back service is running')});
 
         console.log('in useEffect');
+
         let isFront = true;
         mediaDevices.enumerateDevices().then(sourceInfos => {
             console.log(sourceInfos);
             let videoSourceId;
             for (let i = 0; i < sourceInfos.length; i++) {
                 const sourceInfo = sourceInfos[i];
-                if(sourceInfo.kind == "videoinput" && sourceInfo.facing == (isFront ? "front" : "environment")) {
+                if(sourceInfo.kind === "videoinput" && sourceInfo.facing === (isFront ? "front" : "environment")) {
                     videoSourceId = sourceInfo.deviceId;
                 }
             }
@@ -113,6 +140,8 @@ export const Chat = ({ route }) => {
                     height: 480,
                     frameRate: 30,
                     facingMode: (isFront ? "user" : "environment"),
+                    // simulcast implementation, setting codecs for different connection
+                    // quality
                     sendEncodings: [
                         { rid: "h", maxBitrate: 1200 * 1024 },
                         { rid: "m", maxBitrate:  600 * 1024, scaleResolutionDownBy: 2 },
@@ -130,6 +159,7 @@ export const Chat = ({ route }) => {
         });
     }, [])
 
+
      const toggleMicro = () => {
        myStream.getAudioTracks()[0].enabled=isMicro;
        setIsMicro(!isMicro);
@@ -144,28 +174,23 @@ export const Chat = ({ route }) => {
         myStream.getVideoTracks().forEach( (track) => {
             track._switchCamera();
         })
+        forceUpdate();
     }
 
+
     const onBodyClick = () => {
-        if(showControlButtons) {
-            setShowControlButtons(false);
-        } else {
-            setShowControlButtons(true);
-            const timeout = setTimeout(() => {
-                setShowControlButtons(false);
-            }, 3000);
-            setTimeOutToCloseButtons(timeout);
-        }
+        setShowControlButtons(!showControlButtons)
     }
 
     const endCall = () => {
-        clearTimeout(timeOutToCloseButtons);
-        myStream.getTracks().forEach(t => {
-            t.stop();
-            t.enabled=false;
-        });
+        setLastConnectedRoom(null);
+        myStream.getTracks().forEach(t => t.stop());
+        remoteStreams.forEach(tr => tr.getTracks().forEach(t => t.stop()));
+        remoteStreams.forEach(t => t.release());
+        myStream.release();
         peer.destroy();
         navigation.dispatch(popOnce);
+        VIForegroundService.stopService().then(r => console.log('background service is stopped'));
     }
 
     const controlButtons = {
@@ -187,6 +212,7 @@ export const Chat = ({ route }) => {
                     roomId={roomId}
                     showControlButtons={showControlButtons}
                     controlButtons={controlButtons}
+                    setRemoteStreams={setRemoteStreams}
                 />
         </TouchableOpacity>
     )
