@@ -37,11 +37,11 @@ export const Home = () => {
         const roomId = generateID();
         console.log(roomId); // Share this room id to another peer in order to join in the same room
         setRoomId(roomId);
-        navigation.navigate('Chat', { roomId, setLastConnectedRoom });
+        navigation.navigate('Chat', { roomId , setLastConnectedRoom});
     }
 
     const handleReconnect = () => {
-        // Reconnect to room
+        // Reconnect to room, using saved id
         navigation.navigate('Chat', {roomId: lastConnectedRoom, setLastConnectedRoom} )
     }
 

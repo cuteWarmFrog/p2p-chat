@@ -10,7 +10,6 @@ import Peer from 'react-native-peerjs';
 import { StackActions } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 import VIForegroundService from '@voximplant/react-native-foreground-service';
-import BackgroundTimer from 'react-native-background-timer';
 import {useRoute} from '@react-navigation/native';
 import {useForceUpdate} from "../hooks/useForceUpdate";
 
@@ -21,22 +20,19 @@ export const Chat = ({ route }) => {
     const [myStream, setMyStream] = useState(null);
     const [remoteStreams, setRemoteStreams] = useState([]);
 
-    const [showControlButtons, setShowControlButtons] = useState(true);
+    const [showControlButtons, setShowControlButtons] = useState(false);
     const [isCamera, setIsCamera] = useState(false);
     const [isMicro, setIsMicro] = useState(false);
 
-    //const [lastConnectedRoom, setLastConnectedRoom] = useState(null);
-
-    //const forceUpdate = useForceUpdate();
-
     const [peer, setPeer] = useState(null);
+    const forceUpdate = useForceUpdate();
 
     const [timeOutToCloseButtons, setTimeOutToCloseButtons] = useState(null);
 
     const popOnce = StackActions.pop(1);
     const navigation = useNavigation();
 
-    const { roomId, setLastConnectedRoom } = route.params;
+    const { roomId, setLastConnectedRoom:setLastConnectedRoom } = route.params;
 
     const joinRoom = useCallback((myStream) => {
 
@@ -95,27 +91,13 @@ export const Chat = ({ route }) => {
 
     useEffect(() => {
 
-        // BackgroundTimer.runBackgroundTimer(() => {
-        //     console.log('1234')
-        //    remoteStreams.forEach((t,index) => {
-        //        console.log('asdads',index)
-        //        if (t.getVideoTracks()[0].enabled){
-        //            console.log('asdads',index)
-        //            // let streamArray = [...myStream]
-        //            // setRemoteStreams(streamArray.slice(index,1));
-        //            // console.log('deleted')
-        //        }
-        //    })
-        //     if (!remoteStreams){
-        //         console.log('fghjk')
-        //     }
-        // }, 500)
-
+        // background daemon to keep connection alive
+        // after disconnect
         async function startForegroundService() {
 
             const channelConfig = {
                 id: 'channelId',
-                name: 'Channel name',
+                name: 'Messenger notifications',
                 description: 'Channel description',
                 enableVibration: false
             };
@@ -138,13 +120,14 @@ export const Chat = ({ route }) => {
         startForegroundService().then(r => {console.log('back service is running')});
 
         console.log('in useEffect');
+
         let isFront = true;
         mediaDevices.enumerateDevices().then(sourceInfos => {
             console.log(sourceInfos);
             let videoSourceId;
             for (let i = 0; i < sourceInfos.length; i++) {
                 const sourceInfo = sourceInfos[i];
-                if(sourceInfo.kind == "videoinput" && sourceInfo.facing == (isFront ? "front" : "environment")) {
+                if(sourceInfo.kind === "videoinput" && sourceInfo.facing === (isFront ? "front" : "environment")) {
                     videoSourceId = sourceInfo.deviceId;
                 }
             }
@@ -155,6 +138,8 @@ export const Chat = ({ route }) => {
                     height: 480,
                     frameRate: 30,
                     facingMode: (isFront ? "user" : "environment"),
+                    // simulcast implementation, setting codecs for different connection
+                    // quality
                     sendEncodings: [
                         { rid: "h", maxBitrate: 1200 * 1024 },
                         { rid: "m", maxBitrate:  600 * 1024, scaleResolutionDownBy: 2 },
@@ -176,45 +161,33 @@ export const Chat = ({ route }) => {
      const toggleMicro = () => {
        myStream.getAudioTracks()[0].enabled=isMicro;
        setIsMicro(!isMicro);
-       //forceUpdate();
     }
 
     const toggleCamera = () => {
         myStream.getVideoTracks()[0].enabled = isCamera;
         setIsCamera(!isCamera);
-       // forceUpdate();
     }
 
     const switchCameraView = () => {
         myStream.getVideoTracks().forEach( (track) => {
             track._switchCamera();
         })
-       // forceUpdate();
+        forceUpdate();
     }
 
 
     const onBodyClick = () => {
-        // if(showControlButtons) {
-        //     setShowControlButtons(false);
-        // } else {
-        //     setShowControlButtons(true);
-        //     const timeout = setTimeout(() => {
-        //         setShowControlButtons(false);
-        //     }, 3000);
-        //     setTimeOutToCloseButtons(timeout);
-        // }
+        setShowControlButtons(!showControlButtons)
     }
 
     const endCall = () => {
         setLastConnectedRoom(null);
-        clearTimeout(timeOutToCloseButtons);
         myStream.getTracks().forEach(t => t.stop());
         remoteStreams.forEach(tr => tr.getTracks().forEach(t => t.stop()));
         remoteStreams.forEach(t => t.release());
         myStream.release();
         peer.destroy();
         navigation.dispatch(popOnce);
-        BackgroundTimer.stopBackgroundTimer();
         VIForegroundService.stopService().then(r => console.log('background service is stopped'));
     }
 
@@ -232,7 +205,6 @@ export const Chat = ({ route }) => {
             style={{flex: 1}}>
                 <VideoChat
                     myStream={myStream}
-                    //remoteStreams={[myStream, myStream, myStream, myStream]}
                     remoteStreams={[...remoteStreams]}
                     roomId={roomId}
                     showControlButtons={showControlButtons}

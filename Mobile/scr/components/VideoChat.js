@@ -102,13 +102,11 @@ export const VideoChat = (
         }
     },[myStream, remoteStreams]);
 
+    // removing null streams
     useEffect(() => {
-        console.log('good')
         remoteStreams.forEach((track, index) => {
-            console.log(index)
             track.getVideoTracks().forEach(t=> {
-                    if (!t.enabled){
-                        console.log('slicing')
+                    if (!t){
                         let arrayStream = [...remoteStreams];
                         setRemoteStreams(arrayStream.slice(index,1))
                     }

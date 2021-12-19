@@ -3,11 +3,13 @@ import React from 'react';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { LogBox } from 'react-native';
 
 import { Home } from './scr/screens/Home';
 import { Chat } from './scr/screens/Chat';
 
 const Stack = createStackNavigator();
+LogBox.ignoreAllLogs(true)
 
 export default function App(){
     return(

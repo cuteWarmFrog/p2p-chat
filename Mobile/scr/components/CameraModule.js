@@ -21,7 +21,7 @@ export default function CameraModule(props) {
         return (
             <View style={styles.noImage}>
                 <Text>
-                    No image
+                    No source image
                 </Text>
             </View>
         )
