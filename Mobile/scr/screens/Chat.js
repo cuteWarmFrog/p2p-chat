@@ -66,7 +66,7 @@ export const Chat = ({ route }) => {
         peerServer.on('open', async (userId) => {
             // sending signal to server, on which
             // it will answer with room-joining and that roomId
-         
+
             const token = await getFcmToken();
             console.log(token);
             localSocket.emit('join-room', { userId, roomId });
@@ -183,7 +183,7 @@ export const Chat = ({ route }) => {
     }
 
     const endCall = () => {
-        setLastConnectedRoom(null);
+        //setLastConnectedRoom(null);
         myStream.getTracks().forEach(t => t.stop());
         remoteStreams.forEach(tr => tr.getTracks().forEach(t => t.stop()));
         remoteStreams.forEach(t => t.release());

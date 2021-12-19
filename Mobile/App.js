@@ -25,6 +25,8 @@ PushNotification.configure({
     onNotification: function (notification) {
         console.log("NOTIFICATION:", notification);
 
+        //{ roomId, login, setLastConnectedRoom }
+        // navigator.navigate('Chat', {roomId: notification.data.roomId})
         // process the notification
 
         // (required) Called when a remote is received or opened, or local notification is opened
