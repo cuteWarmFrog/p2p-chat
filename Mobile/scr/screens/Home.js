@@ -19,7 +19,7 @@ export const Home = () => {
         return unsubscribe;
     }, []);
 
-    // Generating random room id for the initiating peer
+    // Generating random room id for the initiating pee
     const generateID = () => {
         let result = '';
         const characters = 'abcdefghjkmnpqrstuvwxyz123456789';
@@ -49,7 +49,7 @@ export const Home = () => {
         <View style={styles.container}>
             <Text style={styles.title}>You're looking beautiful today!</Text>
             <Text style={styles.subtitle}>Make a room!</Text>
-            <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+            <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,254,255,0.1)" />
             <TextInput
                 placeholder="Enter Room ID"
                 onChangeText={ (text) => setRoomId(text)}
