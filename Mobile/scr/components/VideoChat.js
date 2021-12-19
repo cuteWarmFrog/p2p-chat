@@ -33,21 +33,20 @@ export const VideoChat = (
     const renderStream = useCallback((myStream, partnerStream) => {
         return (
             <>
-
-                <TouchableOpacity style={ styles.smallCornerCameraContainer}
-                                          onPress={() => {setIsPartnerBig(!isPartnerBig); }}
-                >
-                    {!isPartnerBig ?
-                        <CameraModule stream={partnerStream} /> :
-                        <CameraModule withSwitchButton stream={myStream} />
-                    }
-                </TouchableOpacity>
                 <View style={styles.fullscreenCameraContainer}>
                     {isPartnerBig ?
                         (<CameraModule stream={partnerStream}/>) :
                         <CameraModule stream={myStream}/>
                     }
                 </View>
+                <TouchableOpacity style={ styles.smallCornerCameraContainer}
+                                  onPress={() => {setIsPartnerBig(!isPartnerBig); }}
+                >
+                    {!isPartnerBig ?
+                        <CameraModule stream={partnerStream} /> :
+                        <CameraModule withSwitchButton stream={myStream} />
+                    }
+                </TouchableOpacity>
             </>
         )
     }, [isPartnerBig, setIsPartnerBig]);
@@ -188,8 +187,8 @@ const styles = StyleSheet.create({
         marginLeft: "-10%",
     },
     smallCornerCameraContainer: {
-        zIndex: 10,
-        elevation: 1000,
+        zIndex: 1500,
+        elevation: 1500,
         position: 'absolute',
         top: 25,
         right: 25,
