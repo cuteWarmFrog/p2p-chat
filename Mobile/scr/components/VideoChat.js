@@ -30,7 +30,8 @@ export const VideoChat = (
     const { toggleMicro, toggleCamera, endCall, switchCameraView } = controlButtons;
     const [isPartnerBig, setIsPartnerBig] = useState(true);
 
-    const renderStream = useCallback((myStream, partnerStream) => {
+    const renderStream = (myStream, partnerStream) => {
+        console.log('isPartner big', isPartnerBig);
         return (
             <>
                 <View style={styles.fullscreenCameraContainer}>
@@ -40,16 +41,16 @@ export const VideoChat = (
                     }
                 </View>
                 <TouchableOpacity style={ styles.smallCornerCameraContainer}
-                                  onPress={() => {setIsPartnerBig(!isPartnerBig); }}
+                                  onPress={() => setIsPartnerBig(isPartnerBig => !isPartnerBig)}
                 >
                     {!isPartnerBig ?
                         <CameraModule stream={partnerStream} /> :
-                        <CameraModule withSwitchButton stream={myStream} />
+                        <CameraModule stream={myStream} />
                     }
                 </TouchableOpacity>
             </>
         )
-    }, [isPartnerBig, setIsPartnerBig]);
+    }
 
     const renderStreamFullScreen = useCallback((stream) => {
         return (

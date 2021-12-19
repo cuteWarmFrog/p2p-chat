@@ -9,12 +9,21 @@ import {getFcmToken} from "../utils/firebase";
 
 const BLUE = "#007AFF";
 const BLACK = "#000000";
-const LENGTH = 6; // Length of the Room ID
+const LENGTH = 4; // Length of the Room ID
 
 export const Home = () => {
     const navigation = useNavigation();
     const [roomId, setRoomId] = useState('');
-    const [login, setLogin] = useState('');
+    const [login, setLogin] = useState('your login');
+    const [loginInput, setLoginInput] = useState('');
+    const [token, setToken] = useState('');
+    const [toCall, setToCall] = useState('');
+
+    useEffect(() => {
+        (() =>getFcmToken().then(token => {
+            setToken(token)
+        }))();
+    })
 
     useEffect(() => {
         const unsubscribe = messaging().onMessage(async remoteMessage => {
@@ -68,17 +77,49 @@ export const Home = () => {
         }
     }
 
+    const checkLogin = () => {
+        console.log(loginInput);
+        axios.get(`${URL}/login`, { params: { userLogin: loginInput, token: token}})
+            .then(response => {
+                if(response.data === 'Success login in Base!') {
+                    setLogin(loginInput);
+                } else {
+                    setLogin(response.data);
+                }
+            })
+            .catch(e => {
+                console.log('error', e);
+            });
+    }
+
+    const call = () => {
+        axios.get(`${URL}/login`, { params: { userLogin: toCall}})
+            .then(response => {
+                if(response.data === 'Login is taken!') {
+                    axios.get(`${URL}/call`, { params: { userLogin: toCall, login}})
+                        .then(response => {
+                            handleCreateSubmit();
+                        })
+
+                }
+            })
+    }
+
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Wild Boar</Text>
-            {/*<Text style={styles.subtitle}>Make a room!</Text>*/}
-            {/*<View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />*/}
+            <Text style={styles.title}>{login}</Text>
             <TextInput
                 placeholder="Username"
-                onChangeText={ (text) => setLogin(text)}
+                onChangeText={(text) => setLoginInput(text)}
                 style={ styles.textInput }
             />
-            <SecondaryButton title='/Login' onPress={ handleLogin } />
+            <SecondaryButton title='Login' onPress={ checkLogin } />
+            <TextInput
+                placeholder="to call"
+                onChangeText={(text) => setToCall(text)}
+                style={ styles.textInput }
+            />
+            <SecondaryButton title='Login' onPress={ call} />
 
             <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
             <TextInput
