@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import { Text, View, Button, TextInput, StyleSheet } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import { Text, View, Button, TextInput, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import {PrimaryButton, SecondaryButton} from "../components/Themed";
-
+import messaging from '@react-native-firebase/messaging';
+import axios from 'axios';
+import { URL } from '../utils/urls';
+import {getFcmToken} from "../utils/firebase";
 
 const BLUE = "#007AFF";
 const BLACK = "#000000";
@@ -11,6 +14,14 @@ const LENGTH = 6; // Length of the Room ID
 export const Home = () => {
     const navigation = useNavigation();
     const [roomId, setRoomId] = useState('');
+    const [login, setLogin] = useState('');
+
+    useEffect(() => {
+        const unsubscribe = messaging().onMessage(async remoteMessage => {
+            console.log('A new FCM message arrived!', JSON.stringify(remoteMessage));
+        });
+        return unsubscribe;
+    }, []);
 
     const [lastConnectedRoom, setLastConnectedRoom] = useState(null);
 
@@ -28,7 +39,7 @@ export const Home = () => {
     const handleSubmit = () => {
         if (roomId !== '') {
             // Enter the room
-            navigation.navigate('Chat', { roomId, setLastConnectedRoom });
+            navigation.navigate('Chat', { roomId, login, setLastConnectedRoom });
         }
     }
 
@@ -45,10 +56,30 @@ export const Home = () => {
         navigation.navigate('Chat', {roomId: lastConnectedRoom, setLastConnectedRoom} )
     }
 
+    const handleLogin = async () => {
+        const token = await getFcmToken();
+        console.log('login:', login);
+        console.log('token:', token);
+        try {
+            const response = await axios(`${URL}/login`, { params: {userLogin: login, token }});
+            console.log(response.data);
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>You're looking beautiful today!</Text>
-            <Text style={styles.subtitle}>Make a room!</Text>
+            <Text style={styles.title}>Wild Boar</Text>
+            {/*<Text style={styles.subtitle}>Make a room!</Text>*/}
+            {/*<View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />*/}
+            <TextInput
+                placeholder="Username"
+                onChangeText={ (text) => setLogin(text)}
+                style={ styles.textInput }
+            />
+            <SecondaryButton title='/Login' onPress={ handleLogin } />
+
             <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
             <TextInput
                 placeholder="Enter Room ID"

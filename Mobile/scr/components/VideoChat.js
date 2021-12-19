@@ -128,6 +128,8 @@ export const VideoChat = (
         }
     }, [toggleCamera, toggleMicro, switchCameraView, endCall, showControlButtons]);
 
+    console.log('streams now:', remoteStreams.length);
+
     return (
         <View style={styles.container}>
             <View style={styles.roomCredits}>

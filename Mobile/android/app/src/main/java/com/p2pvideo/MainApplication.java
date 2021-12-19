@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.Context;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
+import io.invertase.firebase.messaging.ReactNativeFirebaseMessagingPackage;
+import io.invertase.firebase.app.ReactNativeFirebaseAppPackage;
 import com.ocetnik.timer.BackgroundTimerPackage;
 import com.zxcpoiu.incallmanager.InCallManagerPackage;
 import com.facebook.react.ReactInstanceManager;
@@ -25,7 +27,11 @@ public class MainApplication extends Application implements ReactApplication {
         @Override
         protected List<ReactPackage> getPackages() {
           @SuppressWarnings("UnnecessaryLocalVariable")
-          List<ReactPackage> packages = new PackageList(this).getPackages();
+          List<ReactPackage> packages = new PackageList(this).getPackages(
+          );
+//           packages.add(new LinearGradientPackage());
+//           packages.add(new FBSDKPackage());
+//           packages.add(new RNFirebaseMessagingPackage());
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new MyReactNativePackage());
           return packages;

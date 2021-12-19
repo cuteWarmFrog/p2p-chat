@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useCallback} from "react";
-import { TouchableOpacity, TouchableWithoutFeedback } from "react-native";
+import { TouchableOpacity } from "react-native";
 import IO from "socket.io-client";
 import {VideoChat} from '../components/VideoChat';
 
@@ -13,10 +13,10 @@ import VIForegroundService from '@voximplant/react-native-foreground-service';
 import {useRoute} from '@react-navigation/native';
 import {useForceUpdate} from "../hooks/useForceUpdate";
 
-const URL = 'http://joeyke.ru:14050';
+import { URL } from '../utils/urls';
+import {getFcmToken} from "../utils/firebase";
 
 export const Chat = ({ route }) => {
-
     const [myStream, setMyStream] = useState(null);
     const [remoteStreams, setRemoteStreams] = useState([]);
 
@@ -31,8 +31,7 @@ export const Chat = ({ route }) => {
 
     const popOnce = StackActions.pop(1);
     const navigation = useNavigation();
-
-    const { roomId, setLastConnectedRoom:setLastConnectedRoom } = route.params;
+    const { roomId, login, setLastConnectedRoom:setLastConnectedRoom } = route.params;
 
     const joinRoom = useCallback((myStream) => {
 
@@ -64,10 +63,13 @@ export const Chat = ({ route }) => {
 
         setMyStream(myStream);
 
-        peerServer.on('open', (userId) => {
+        peerServer.on('open', async (userId) => {
             // sending signal to server, on which
             // it will answer with room-joining and that roomId
-            localSocket.emit('join-room', {userId, roomId});
+         
+            const token = await getFcmToken();
+            console.log(token);
+            localSocket.emit('join-room', { userId, roomId });
             setLastConnectedRoom(roomId);
             console.log('join-room: ', userId, roomId);
         })
@@ -84,13 +86,13 @@ export const Chat = ({ route }) => {
         localSocket.on('user-connected', (userId) => {
             // after server transfer user id, try to connect to
             // new room
+            console.log('in uc');
             connectToNewUser(userId, myStream);
         })
 
     }, []);
 
     useEffect(() => {
-
         // background daemon to keep connection alive
         // after disconnect
         async function startForegroundService() {
@@ -205,6 +207,7 @@ export const Chat = ({ route }) => {
             style={{flex: 1}}>
                 <VideoChat
                     myStream={myStream}
+                    // remoteStreams={[myStream, myStream, myStream, myStream]}
                     remoteStreams={[...remoteStreams]}
                     roomId={roomId}
                     showControlButtons={showControlButtons}
