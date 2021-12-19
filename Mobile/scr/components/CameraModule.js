@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 import {
     StyleSheet,
-    View as DefaultView
 } from 'react-native';
 import {
     View,
@@ -15,7 +14,7 @@ export default function CameraModule(props) {
 
     const renderStream = useCallback((stream) => {
         if(stream.getVideoTracks()[0].enabled) {
-            return <RTCView zOrder={zOrder ? zOrder : 0} style={styles.camera} streamURL={stream.toURL()} />
+            return <RTCView zOrder={zOrder ? zOrder : 0} style={styles.camera} objectFit={'cover'} streamURL={stream.toURL()} />
         }
         return (
             <View style={styles.noImage}>
@@ -27,9 +26,9 @@ export default function CameraModule(props) {
     }, []);
 
     return (
-        <View style={styles.camera}>
+        <>
             {renderStream(stream)}
-        </View>
+        </>
 
     );
 }
@@ -37,8 +36,6 @@ export default function CameraModule(props) {
 const styles = StyleSheet.create({
     camera: {
         flex: 1,
-        width: '120%',
-        marginLeft: "-10%",
 
     },
     noImage: {
