@@ -12,6 +12,8 @@ export const Home = () => {
     const navigation = useNavigation();
     const [roomId, setRoomId] = useState('');
 
+    const [lastConnectedRoom, setLastConnectedRoom] = useState(null);
+
     // Generating random room id for the initiating peer
     const generateID = () => {
         let result = '';
@@ -26,7 +28,7 @@ export const Home = () => {
     const handleSubmit = () => {
         if (roomId !== '') {
             // Enter the room
-            navigation.navigate('Chat', { roomId });
+            navigation.navigate('Chat', { roomId, setLastConnectedRoom });
         }
     }
 
@@ -35,7 +37,12 @@ export const Home = () => {
         const roomId = generateID();
         console.log(roomId); // Share this room id to another peer in order to join in the same room
         setRoomId(roomId);
-        navigation.navigate('Chat', { roomId });
+        navigation.navigate('Chat', { roomId, setLastConnectedRoom });
+    }
+
+    const handleReconnect = () => {
+        // Reconnect to room
+        navigation.navigate('Chat', {roomId: lastConnectedRoom, setLastConnectedRoom} )
     }
 
     return (
@@ -52,6 +59,8 @@ export const Home = () => {
             <View style={styles.buttonsWrapper}>
                 <SecondaryButton title='Join Room' onPress={ handleSubmit } />
                 <PrimaryButton title='Make Room' onPress={ handleCreateSubmit } />
+                {lastConnectedRoom && <SecondaryButton title='Reconnect' onPress={ handleReconnect } />}
+
             </View>
         </View>
     )

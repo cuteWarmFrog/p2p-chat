@@ -25,6 +25,8 @@ export const Chat = ({ route }) => {
     const [isCamera, setIsCamera] = useState(false);
     const [isMicro, setIsMicro] = useState(false);
 
+    //const [lastConnectedRoom, setLastConnectedRoom] = useState(null);
+
     const forceUpdate = useForceUpdate();
 
     const [peer, setPeer] = useState(null);
@@ -34,7 +36,7 @@ export const Chat = ({ route }) => {
     const popOnce = StackActions.pop(1);
     const navigation = useNavigation();
 
-    const { roomId } = route.params;
+    const { roomId, setLastConnectedRoom } = route.params;
 
     const joinRoom = useCallback((myStream) => {
 
@@ -70,6 +72,7 @@ export const Chat = ({ route }) => {
             // sending signal to server, on which
             // it will answer with room-joining and that roomId
             localSocket.emit('join-room', {userId, roomId});
+            setLastConnectedRoom(roomId);
             console.log('join-room: ', userId, roomId);
         })
 
@@ -188,6 +191,21 @@ export const Chat = ({ route }) => {
         forceUpdate();
     }
 
+    useEffect(() => {
+        console.log('good')
+        remoteStreams.forEach((track, index) => {
+            console.log(index)
+            track.getVideoTracks().forEach(t=> {
+                    if (t.enabled){
+                        console.log('slicing')
+                        let arrayStream = [...remoteStreams];
+                        setRemoteStreams(arrayStream.slice(index,1))
+                    }
+                }
+            )
+        })
+    }, [myStream, remoteStreams]);
+
     const onBodyClick = () => {
         // if(showControlButtons) {
         //     setShowControlButtons(false);
@@ -201,6 +219,7 @@ export const Chat = ({ route }) => {
     }
 
     const endCall = () => {
+        setLastConnectedRoom(null);
         clearTimeout(timeOutToCloseButtons);
         myStream.getTracks().forEach(t => t.stop());
         remoteStreams.forEach(tr => tr.getTracks().forEach(t => t.stop()));

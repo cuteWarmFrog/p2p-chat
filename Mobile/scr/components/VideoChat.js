@@ -84,21 +84,6 @@ export const VideoChat = (
         )
     }, []);
 
-    useEffect(() => {
-        console.log('good')
-        remoteStreams.forEach((track, index) => {
-            console.log(index)
-            track.getVideoTracks().forEach(t=> {
-                if (t.enabled){
-                    console.log('slicing')
-                    let arrayStream = [...remoteStreams];
-                    //setRemoteStreams(arrayStream.slice(index,1))
-                }
-            }
-        )
-        })
-    }, [myStream, remoteStreams]);
-
     const renderChat = useCallback(() => {
         if (!remoteStreams)
             return null;
