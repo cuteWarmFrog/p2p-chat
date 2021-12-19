@@ -52,12 +52,18 @@ export const Home = () => {
         }
     }
 
-    const handleCreateSubmit = () => {
+    const handleCreateSubmit = (roomId) => {
         // Make a new room ID
-        const roomId = generateID();
-        console.log(roomId); // Share this room id to another peer in order to join in the same room
-        setRoomId(roomId);
-        navigation.navigate('Chat', { roomId, login, setLastConnectedRoom});
+        let id2 = roomId;
+        if(!id2) {
+
+            id2 = generateID();
+            setRoomId(roomId);
+            navigation.navigate('Chat', { roomId: id2, login, setLastConnectedRoom});
+        }
+        console.log(id2); // Share this room id to another peer in order to join in the same room
+        setRoomId(id2);
+        navigation.navigate('Chat', { roomId: id2, login, setLastConnectedRoom});
     }
 
     const handleReconnect = () => {
@@ -96,9 +102,10 @@ export const Home = () => {
         axios.get(`${URL}/login`, { params: { userLogin: toCall}})
             .then(response => {
                 if(response.data === 'Login is taken!') {
-                    axios.get(`${URL}/call`, { params: { userLogin: toCall, login}})
+                    const roomId = generateID();
+                    axios.get(`${URL}/call`, { params: { partnerLogin: toCall, login, roomId: roomId }})
                         .then(response => {
-                            handleCreateSubmit();
+                            handleCreateSubmit(roomId);
                         })
 
                 }
@@ -119,7 +126,7 @@ export const Home = () => {
                 onChangeText={(text) => setToCall(text)}
                 style={ styles.textInput }
             />
-            <SecondaryButton title='Login' onPress={ call} />
+            <SecondaryButton title='Call' onPress={ call} />
 
             <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
             <TextInput
