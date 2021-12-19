@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Text, View, Button, TextInput, StyleSheet } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import { Text, View, Button, TextInput, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import {PrimaryButton, SecondaryButton} from "../components/Themed";
-
+import messaging from '@react-native-firebase/messaging';
 
 const BLUE = "#007AFF";
 const BLACK = "#000000";
@@ -11,6 +11,13 @@ const LENGTH = 6; // Length of the Room ID
 export const Home = () => {
     const navigation = useNavigation();
     const [roomId, setRoomId] = useState('');
+
+    useEffect(() => {
+        const unsubscribe = messaging().onMessage(async remoteMessage => {
+            console.log('A new FCM message arrived!', JSON.stringify(remoteMessage));
+        });
+        return unsubscribe;
+    }, []);
 
     // Generating random room id for the initiating peer
     const generateID = () => {

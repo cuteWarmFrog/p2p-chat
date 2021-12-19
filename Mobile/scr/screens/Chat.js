@@ -9,11 +9,9 @@ import InCallManager from 'react-native-incall-manager';
 import Peer from 'react-native-peerjs';
 import { StackActions } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
-import {useRoute} from '@react-navigation/native';
 
-
-// const URL = 'http://172.28.76.96:6000';
-const URL = 'http://joeyke.ru:14050';
+import { URL } from '../utils/urls';
+import {getFcmToken} from "../utils/firebase";
 
 export const Chat = ({ route }) => {
     const [myStream, setMyStream] = useState(null);
@@ -58,8 +56,10 @@ export const Chat = ({ route }) => {
 
         setMyStream(myStream);
 
-        peerServer.on('open', (userId) => {
-            localSocket.emit('join-room', { userId, roomId });
+        peerServer.on('open', async (userId) => {
+            const token = await getFcmToken();
+            localSocket.emit('join-room', { userId, roomId, token });
+
             console.log('join-room: ', userId, roomId);
         })
 

@@ -3,7 +3,6 @@ const http = require('http');
 const socketio = require('socket.io');
 
 const { ExpressPeerServer } = require('peer');
-
 const app = express();
 
 const server = http.createServer(app);
@@ -28,6 +27,7 @@ io.on('connection', (socket) => {
     socket.on('join-room', ({ roomId, userId }) => {
         socket.join(roomId);
         socket.to(roomId).broadcast.emit('user-connected', userId);
+
     })
 })
 

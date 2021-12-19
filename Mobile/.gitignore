@@ -4,6 +4,8 @@
 ios
 # Xcode
 #
+.idea
+yarn.lock
 node_modules
 build/
 *.pbxuser
