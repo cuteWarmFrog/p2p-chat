@@ -10,17 +10,21 @@ import Peer from 'react-native-peerjs';
 import { StackActions } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 import VIForegroundService from '@voximplant/react-native-foreground-service';
+import BackgroundTimer from 'react-native-background-timer';
 import {useRoute} from '@react-navigation/native';
 
 const URL = 'http://joeyke.ru:14050';
 
 export const Chat = ({ route }) => {
+    //BackgroundTimer.runBackgroundTimer( () => {
     const [myStream, setMyStream] = useState(null);
     const [remoteStreams, setRemoteStreams] = useState([]);
 
     const [showControlButtons, setShowControlButtons] = useState(false);
     const [isCamera, setIsCamera] = useState(false);
     const [isMicro, setIsMicro] = useState(false);
+
+    //const [lastRoom]
 
     const [peer, setPeer] = useState(null);
 
@@ -64,7 +68,7 @@ export const Chat = ({ route }) => {
         peerServer.on('open', (userId) => {
             // sending signal to server, on which
             // it will answer with room-joining and that roomId
-            localSocket.emit('join-room', { userId, roomId });
+            localSocket.emit('join-room', {userId, roomId});
             console.log('join-room: ', userId, roomId);
         })
 
@@ -77,7 +81,6 @@ export const Chat = ({ route }) => {
                 setRemoteStreams((remoteStreams) => remoteStreams.concat(stream));
             })
         })
-
         localSocket.on('user-connected', (userId) => {
             // after server transfer user id, try to connect to
             // new room
@@ -88,31 +91,9 @@ export const Chat = ({ route }) => {
 
     useEffect(() => {
 
-        async function startForegroundService() {
 
-            const channelConfig = {
-                id: 'channelId',
-                name: 'Channel name',
-                description: 'Channel description',
-                enableVibration: false
-            };
 
-            const notificationConfig = {
-                channelId: 'channelId',
-                id: 3456,
-                title: 'Title',
-                text: 'Some text',
-                icon: 'ic_icon'
-            };
-            try {
-                await VIForegroundService.createNotificationChannel(channelConfig);
-                await VIForegroundService.startService(notificationConfig);
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
-        startForegroundService().then(r => {console.log('back service is running')});
+       // startForegroundService().then(r => {console.log('back service is running')});
 
         console.log('in useEffect');
         let isFront = true;
@@ -179,8 +160,17 @@ export const Chat = ({ route }) => {
 
     const endCall = () => {
         clearTimeout(timeOutToCloseButtons);
-        peer.destroy();
-        navigation.dispatch(popOnce);
+        myStream.getTracks().forEach(t => {
+            t.stop();
+            t.enabled=false;
+        });
+        //remoteStreams.forEach(tr => tr.getTracks().forEach(t => t.stop()));
+        //remoteStreams.forEach(t => t.release());
+       // myStream.release();
+        //peer.destroy();
+        //navigation.dispatch(popOnce);
+        BackgroundTimer.stopBackgroundTimer();
+        VIForegroundService.stopService().then(r => console.log('background service is stopped'));
     }
 
     const controlButtons = {
