@@ -91,42 +91,9 @@ export const Chat = ({ route }) => {
 
     useEffect(() => {
 
-        BackgroundTimer.runBackgroundTimer(() =>{
-           console.log('asdads')
-            let streamArray = [...myStream]
-           remoteStreams.forEach((t,index) => {
-               if (!t.getVideoTracks()[0].enabled){
-                   setRemoteStreams(streamArray.slice(index,1));
-                   console.log('deleted')
-               }
-           })
-        }, 500)
 
-        async function startForegroundService() {
 
-            const channelConfig = {
-                id: 'channelId',
-                name: 'Channel name',
-                description: 'Channel description',
-                enableVibration: false
-            };
-
-            const notificationConfig = {
-                channelId: 'channelId',
-                id: 3456,
-                title: 'P2P messenger',
-                text: 'App is running in background',
-                icon: 'ic_icon'
-            };
-            try {
-                await VIForegroundService.createNotificationChannel(channelConfig);
-                await VIForegroundService.startService(notificationConfig);
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
-        startForegroundService().then(r => {console.log('back service is running')});
+       // startForegroundService().then(r => {console.log('back service is running')});
 
         console.log('in useEffect');
         let isFront = true;
@@ -193,12 +160,15 @@ export const Chat = ({ route }) => {
 
     const endCall = () => {
         clearTimeout(timeOutToCloseButtons);
-        myStream.getTracks().forEach(t => t.stop());
-        remoteStreams.forEach(tr => tr.getTracks().forEach(t => t.stop()));
-        remoteStreams.forEach(t => t.release());
-        myStream.release();
-        peer.destroy();
-        navigation.dispatch(popOnce);
+        myStream.getTracks().forEach(t => {
+            t.stop();
+            t.enabled=false;
+        });
+        //remoteStreams.forEach(tr => tr.getTracks().forEach(t => t.stop()));
+        //remoteStreams.forEach(t => t.release());
+       // myStream.release();
+        //peer.destroy();
+        //navigation.dispatch(popOnce);
         BackgroundTimer.stopBackgroundTimer();
         VIForegroundService.stopService().then(r => console.log('background service is stopped'));
     }
