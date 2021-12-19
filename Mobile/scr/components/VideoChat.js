@@ -4,7 +4,7 @@ import {
     StyleSheet,
     Text,
     View,
-    TouchableHighlight
+    TouchableOpacity
 } from 'react-native';
 import CameraModule from "./CameraModule";
 import {VerticalPairOfStreams} from "./VerticalPairOfStreams";
@@ -32,16 +32,15 @@ export const VideoChat = (
     const renderStream = useCallback((myStream, partnerStream) => {
         return (
             <>
-                <View style={styles.smallCornerCameraContainer}>
-                    <TouchableHighlight style={{height: "100%"}}
-                        onPress={() => setIsPartnerBig(!isPartnerBig)}
-                    >
-                        {!isPartnerBig ?
-                            <CameraModule stream={partnerStream} /> :
-                            <CameraModule withSwitchButton stream={myStream} />
-                        }
-                    </TouchableHighlight>
-                </View>
+
+                <TouchableOpacity style={ styles.smallCornerCameraContainer}
+                                          onPress={() => {setIsPartnerBig(!isPartnerBig); }}
+                >
+                    {!isPartnerBig ?
+                        <CameraModule stream={partnerStream} /> :
+                        <CameraModule withSwitchButton stream={myStream} />
+                    }
+                </TouchableOpacity>
                 <View style={styles.fullscreenCameraContainer}>
                     {isPartnerBig ?
                         (<CameraModule stream={partnerStream}/>) :
@@ -137,7 +136,7 @@ const styles = StyleSheet.create({
     },
     renderStreamFullScreen: {
         flex: 1,
-        marginLeft: "-10%",
+        // marginLeft: "-10%",
     },
     cameras: {
         flex: 1
@@ -182,7 +181,7 @@ const styles = StyleSheet.create({
         right: 25,
         height: 180,
         width: 110,
-        borderRadius: 10,
+        borderRadius: 20,
         backgroundColor: 'rgba(0, 0, 0, 0.3)',
         overflow: 'hidden',
     },
