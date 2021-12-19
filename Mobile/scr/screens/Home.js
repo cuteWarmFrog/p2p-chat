@@ -15,7 +15,7 @@ const LENGTH = 4; // Length of the Room ID
 export const Home = () => {
     const navigation = useNavigation();
     const [roomId, setRoomId] = useState('');
-    const [login, setLogin] = useState('your login');
+    const [login, setLogin] = useState('');
     const [loginInput, setLoginInput] = useState('');
     const [token, setToken] = useState('');
     const [toCall, setToCall] = useState('');
@@ -124,7 +124,7 @@ export const Home = () => {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Your login: {login}</Text>
-            {login === 'your login' && <>
+            {login === '' && <>
                 <TextInput
                     placeholder="Username"
                     onChangeText={(text) => setLoginInput(text)}
