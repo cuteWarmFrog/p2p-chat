@@ -3,9 +3,9 @@ import { Text, View, Button, TextInput, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import {PrimaryButton, SecondaryButton} from "../components/Themed";
 import messaging from '@react-native-firebase/messaging';
-
 import axios from 'axios';
-const baseUrl = 'http://joeyke.ru:14062';
+import { URL } from '../utils/urls';
+import {getFcmToken} from "../utils/firebase";
 
 const BLUE = "#007AFF";
 const BLACK = "#000000";
@@ -14,7 +14,7 @@ const LENGTH = 6; // Length of the Room ID
 export const Home = () => {
     const navigation = useNavigation();
     const [roomId, setRoomId] = useState('');
-    const [userId, setUserId] = useState('');
+    const [login, setLogin] = useState('');
     const [token, setToken] = useState('emptyToken');
 
     useEffect(() => {
@@ -38,7 +38,7 @@ export const Home = () => {
     const handleSubmit = () => {
         if (roomId !== '') {
             // Enter the room
-            navigation.navigate('Chat', { roomId });
+            navigation.navigate('Chat', { roomId, login });
         }
     }
 
@@ -50,12 +50,16 @@ export const Home = () => {
         navigation.navigate('Chat', { roomId });
     }
 
-    const handleLogin = () => {
-        console.log('userId:', userId);
+    const handleLogin = async () => {
+        const token = await getFcmToken();
+        console.log('login:', login);
         console.log('token:', token);
-        axios.get(`${baseUrl}/login`, {params: {userId, token}}).then((response) => {
+        try {
+            const response = await axios(`${URL}/login`, { params: {userLogin: login, token }});
             console.log(response.data);
-        });
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     return (
@@ -65,7 +69,7 @@ export const Home = () => {
             {/*<View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />*/}
             <TextInput
                 placeholder="Username"
-                onChangeText={ (text) => { console.log('Backed should check if', text, 'is available'); setUserId(text); }}
+                onChangeText={ (text) => setLogin(text)}
                 style={ styles.textInput }
             />
             <SecondaryButton title='/Login' onPress={ handleLogin } />
