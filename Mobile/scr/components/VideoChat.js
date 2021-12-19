@@ -1,8 +1,13 @@
 import React, {useCallback, useState} from 'react';
-import {FlatList, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import {
+    FlatList,
+    StyleSheet,
+    Text,
+    View,
+    TouchableHighlight
+} from 'react-native';
 import CameraModule from "./CameraModule";
 import {VerticalPairOfStreams} from "./VerticalPairOfStreams";
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 
 import {
     faSyncAlt,
@@ -27,21 +32,22 @@ export const VideoChat = (
     const renderStream = useCallback((myStream, partnerStream) => {
         return (
             <>
+                <View style={styles.smallCornerCameraContainer}>
+                    <TouchableHighlight style={{height: "100%"}}
+                        onPress={() => setIsPartnerBig(!isPartnerBig)}
+                    >
+                        {!isPartnerBig ?
+                            <CameraModule stream={partnerStream} /> :
+                            <CameraModule withSwitchButton stream={myStream} />
+                        }
+                    </TouchableHighlight>
+                </View>
                 <View style={styles.fullscreenCameraContainer}>
                     {isPartnerBig ?
                         (<CameraModule stream={partnerStream}/>) :
                         <CameraModule stream={myStream}/>
                     }
                 </View>
-                <TouchableOpacity
-                    onPress={() => setIsPartnerBig(!isPartnerBig)}
-                    style={styles.smallCornerCameraContainer}
-                >
-                    {!isPartnerBig ?
-                        (<CameraModule stream={partnerStream}/>) :
-                        <CameraModule withSwitchButton stream={myStream}/>
-                    }
-                </TouchableOpacity>
             </>
         )
     }, [isPartnerBig, setIsPartnerBig]);
@@ -131,7 +137,7 @@ const styles = StyleSheet.create({
     },
     renderStreamFullScreen: {
         flex: 1,
-        marginLeft: "-20%",
+        marginLeft: "-10%",
     },
     cameras: {
         flex: 1
@@ -163,25 +169,23 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         width: '80%'
     },
-
     fullscreenCameraContainer: {
         flex: 1,
-        zIndex: 10,
-        elevation: 10,
+        width: "120%",
+        marginLeft: "-10%",
     },
-
     smallCornerCameraContainer: {
-        zIndex: 1000,
+        zIndex: 10,
         elevation: 1000,
         position: 'absolute',
         top: 25,
-        right: 20,
+        right: 25,
         height: 180,
         width: 110,
         borderRadius: 10,
         backgroundColor: 'rgba(0, 0, 0, 0.3)',
+        overflow: 'hidden',
     },
-
     controlButtons: {
         zIndex: 1000,
         elevation: 1000,

@@ -12,8 +12,11 @@ import { useNavigation } from '@react-navigation/native';
 
 import { URL } from '../utils/urls';
 import {getFcmToken} from "../utils/firebase";
+import VIForegroundService from '@voximplant/react-native-foreground-service';
+import BackgroundTimer from 'react-native-background-timer';
 
 export const Chat = ({ route }) => {
+    //BackgroundTimer.runBackgroundTimer( () => {
     const [myStream, setMyStream] = useState(null);
     const [remoteStreams, setRemoteStreams] = useState([]);
 
@@ -21,7 +24,10 @@ export const Chat = ({ route }) => {
     const [isCamera, setIsCamera] = useState(false);
     const [isMicro, setIsMicro] = useState(false);
 
+    //const [lastRoom]
+
     const [peer, setPeer] = useState(null);
+
     const [timeOutToCloseButtons, setTimeOutToCloseButtons] = useState(null);
 
     const popOnce = StackActions.pop(1);
@@ -30,8 +36,11 @@ export const Chat = ({ route }) => {
     const { roomId } = route.params;
 
     const joinRoom = useCallback((myStream) => {
+
         const connectToNewUser = (userId, stream) => {
             const call = peerServer.call(userId, stream);
+            // creating call-room here
+            // stream event again here
             call.on('stream', (remoteVideoStream) => {
                 if (remoteVideoStream) {
                     setRemoteStreams((remoteStreams) => remoteStreams.concat(remoteVideoStream))
@@ -57,27 +66,37 @@ export const Chat = ({ route }) => {
         setMyStream(myStream);
 
         peerServer.on('open', async (userId) => {
+            // sending signal to server, on which
+            // it will answer with room-joining and that roomId
             const token = await getFcmToken();
             localSocket.emit('join-room', { userId, roomId, token });
-
+          
             console.log('join-room: ', userId, roomId);
         })
 
         peerServer.on('call', (call) => {
             call.answer(myStream);
+            // answering call here, and then subscribing to
+            // 'stream' event that will trigger new participants screens rendering
             InCallManager.start({media: 'video'}); //runtime call manager
             call.on('stream', (stream) => {
                 setRemoteStreams((remoteStreams) => remoteStreams.concat(stream));
             })
         })
-
         localSocket.on('user-connected', (userId) => {
+            // after server transfer user id, try to connect to
+            // new room
             connectToNewUser(userId, myStream);
         })
 
     }, []);
 
     useEffect(() => {
+
+
+
+       // startForegroundService().then(r => {console.log('back service is running')});
+
         console.log('in useEffect');
         let isFront = true;
         mediaDevices.enumerateDevices().then(sourceInfos => {
@@ -96,6 +115,11 @@ export const Chat = ({ route }) => {
                     height: 480,
                     frameRate: 30,
                     facingMode: (isFront ? "user" : "environment"),
+                    sendEncodings: [
+                        { rid: "h", maxBitrate: 1200 * 1024 },
+                        { rid: "m", maxBitrate:  600 * 1024, scaleResolutionDownBy: 2 },
+                        { rid: "l", maxBitrate:  300 * 1024, scaleResolutionDownBy: 4 }
+                    ],
                     deviceId: videoSourceId
                 }
             }, [])
@@ -138,8 +162,17 @@ export const Chat = ({ route }) => {
 
     const endCall = () => {
         clearTimeout(timeOutToCloseButtons);
-        peer.destroy();
-        navigation.dispatch(popOnce);
+        myStream.getTracks().forEach(t => {
+            t.stop();
+            t.enabled=false;
+        });
+        //remoteStreams.forEach(tr => tr.getTracks().forEach(t => t.stop()));
+        //remoteStreams.forEach(t => t.release());
+       // myStream.release();
+        //peer.destroy();
+        //navigation.dispatch(popOnce);
+        BackgroundTimer.stopBackgroundTimer();
+        VIForegroundService.stopService().then(r => console.log('background service is stopped'));
     }
 
     const controlButtons = {

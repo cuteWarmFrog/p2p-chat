@@ -4,6 +4,9 @@ import { useNavigation } from '@react-navigation/native';
 import {PrimaryButton, SecondaryButton} from "../components/Themed";
 import messaging from '@react-native-firebase/messaging';
 
+import axios from 'axios';
+const baseUrl = 'http://joeyke.ru:14062';
+
 const BLUE = "#007AFF";
 const BLACK = "#000000";
 const LENGTH = 6; // Length of the Room ID
@@ -11,6 +14,8 @@ const LENGTH = 6; // Length of the Room ID
 export const Home = () => {
     const navigation = useNavigation();
     const [roomId, setRoomId] = useState('');
+    const [userId, setUserId] = useState('');
+    const [token, setToken] = useState('emptyToken');
 
     useEffect(() => {
         const unsubscribe = messaging().onMessage(async remoteMessage => {
@@ -45,11 +50,27 @@ export const Home = () => {
         navigation.navigate('Chat', { roomId });
     }
 
+    const handleLogin = () => {
+        console.log('userId:', userId);
+        console.log('token:', token);
+        axios.get(`${baseUrl}/login`, {params: {userId, token}}).then((response) => {
+            console.log(response.data);
+        });
+    }
+
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>You're looking beautiful today!</Text>
-            <Text style={styles.subtitle}>Make a room!</Text>
-            <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,254,255,0.1)" />
+            <Text style={styles.title}>Wild Boar</Text>
+            {/*<Text style={styles.subtitle}>Make a room!</Text>*/}
+            {/*<View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />*/}
+            <TextInput
+                placeholder="Username"
+                onChangeText={ (text) => { console.log('Backed should check if', text, 'is available'); setUserId(text); }}
+                style={ styles.textInput }
+            />
+            <SecondaryButton title='/Login' onPress={ handleLogin } />
+
+            <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
             <TextInput
                 placeholder="Enter Room ID"
                 onChangeText={ (text) => setRoomId(text)}
