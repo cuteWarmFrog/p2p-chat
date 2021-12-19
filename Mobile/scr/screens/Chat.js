@@ -13,10 +13,9 @@ import { useNavigation } from '@react-navigation/native';
 import { URL } from '../utils/urls';
 import {getFcmToken} from "../utils/firebase";
 import VIForegroundService from '@voximplant/react-native-foreground-service';
-import BackgroundTimer from 'react-native-background-timer';
+// import BackgroundTimer from 'react-native-background-timer';
 
 export const Chat = ({ route }) => {
-    //BackgroundTimer.runBackgroundTimer( () => {
     const [myStream, setMyStream] = useState(null);
     const [remoteStreams, setRemoteStreams] = useState([]);
 
@@ -33,7 +32,7 @@ export const Chat = ({ route }) => {
     const popOnce = StackActions.pop(1);
     const navigation = useNavigation();
 
-    const { roomId } = route.params;
+    const { roomId, login } = route.params;
 
     const joinRoom = useCallback((myStream) => {
 
@@ -69,8 +68,8 @@ export const Chat = ({ route }) => {
             // sending signal to server, on which
             // it will answer with room-joining and that roomId
             const token = await getFcmToken();
-            localSocket.emit('join-room', { userId, roomId, token });
-          
+            localSocket.emit('join-room', { userId, roomId, token, login });
+
             console.log('join-room: ', userId, roomId);
         })
 
@@ -166,13 +165,8 @@ export const Chat = ({ route }) => {
             t.stop();
             t.enabled=false;
         });
-        //remoteStreams.forEach(tr => tr.getTracks().forEach(t => t.stop()));
-        //remoteStreams.forEach(t => t.release());
-       // myStream.release();
-        //peer.destroy();
-        //navigation.dispatch(popOnce);
-        BackgroundTimer.stopBackgroundTimer();
-        VIForegroundService.stopService().then(r => console.log('background service is stopped'));
+        peer.destroy();
+        navigation.dispatch(popOnce);
     }
 
     const controlButtons = {
