@@ -52,18 +52,15 @@ export const Home = () => {
         }
     }
 
-    const handleCreateSubmit = (roomId) => {
-        // Make a new room ID
-        let id2 = roomId;
-        if(!id2) {
+    const handleCreateSubmit = () => {
+        const roomId = generateID();
+        setRoomId(roomId);
+        navigation.navigate('Chat', { roomId, login, setLastConnectedRoom});
+    }
 
-            id2 = generateID();
-            setRoomId(roomId);
-            navigation.navigate('Chat', { roomId: id2, login, setLastConnectedRoom});
-        }
-        console.log(id2); // Share this room id to another peer in order to join in the same room
-        setRoomId(id2);
-        navigation.navigate('Chat', { roomId: id2, login, setLastConnectedRoom});
+    const callCreateRoom = (roomId) => {
+        setRoomId(roomId);
+        navigation.navigate('Chat', { roomId, login, setLastConnectedRoom});
     }
 
     const handleReconnect = () => {
@@ -103,9 +100,9 @@ export const Home = () => {
             .then(response => {
                 if(response.data === 'Login is taken!') {
                     const roomId = generateID();
-                    axios.get(`${URL}/call`, { params: { partnerLogin: toCall, login, roomId: roomId }})
+                    axios.get(`${URL}/call`, { params: { partnerLogin: toCall, login, roomId}})
                         .then(response => {
-                            handleCreateSubmit(roomId);
+                            callCreateRoom(roomId);
                         })
 
                 }
