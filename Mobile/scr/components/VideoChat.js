@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
     FlatList,
     StyleSheet,
@@ -83,6 +83,18 @@ export const VideoChat = (
                 />
         )
     }, []);
+
+    useEffect(() => {
+        console.log('good')
+        remoteStreams.forEach((track, index) => {
+            console.log(index)
+            if (!track.getVideoTracks()[0].enabled){
+                console.log('slicing')
+                let arrayStream = [...remoteStreams];
+                //setRemoteStreams(arrayStream.slice(index,1))
+            }
+        })
+    }, [myStream, remoteStreams]);
 
     const renderChat = useCallback(() => {
         if (!remoteStreams)

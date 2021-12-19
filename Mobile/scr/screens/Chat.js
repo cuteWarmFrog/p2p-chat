@@ -12,19 +12,20 @@ import { useNavigation } from '@react-navigation/native';
 import VIForegroundService from '@voximplant/react-native-foreground-service';
 import BackgroundTimer from 'react-native-background-timer';
 import {useRoute} from '@react-navigation/native';
+import {useForceUpdate} from "../hooks/useForceUpdate";
 
 const URL = 'http://joeyke.ru:14050';
 
 export const Chat = ({ route }) => {
-    //BackgroundTimer.runBackgroundTimer( () => {
+
     const [myStream, setMyStream] = useState(null);
     const [remoteStreams, setRemoteStreams] = useState([]);
 
-    const [showControlButtons, setShowControlButtons] = useState(false);
+    const [showControlButtons, setShowControlButtons] = useState(true);
     const [isCamera, setIsCamera] = useState(false);
     const [isMicro, setIsMicro] = useState(false);
 
-    //const [lastRoom]
+    const forceUpdate = useForceUpdate();
 
     const [peer, setPeer] = useState(null);
 
@@ -91,16 +92,21 @@ export const Chat = ({ route }) => {
 
     useEffect(() => {
 
-        BackgroundTimer.runBackgroundTimer(() =>{
-           console.log('asdads')
-            let streamArray = [...myStream]
-           remoteStreams.forEach((t,index) => {
-               if (!t.getVideoTracks()[0].enabled){
-                   setRemoteStreams(streamArray.slice(index,1));
-                   console.log('deleted')
-               }
-           })
-        }, 500)
+        // BackgroundTimer.runBackgroundTimer(() => {
+        //     console.log('1234')
+        //    remoteStreams.forEach((t,index) => {
+        //        console.log('asdads',index)
+        //        if (t.getVideoTracks()[0].enabled){
+        //            console.log('asdads',index)
+        //            // let streamArray = [...myStream]
+        //            // setRemoteStreams(streamArray.slice(index,1));
+        //            // console.log('deleted')
+        //        }
+        //    })
+        //     if (!remoteStreams){
+        //         console.log('fghjk')
+        //     }
+        // }, 500)
 
         async function startForegroundService() {
 
@@ -163,6 +169,7 @@ export const Chat = ({ route }) => {
         });
     }, [])
 
+
      const toggleMicro = () => {
        myStream.getAudioTracks()[0].enabled=isMicro;
        setIsMicro(!isMicro);
@@ -177,18 +184,19 @@ export const Chat = ({ route }) => {
         myStream.getVideoTracks().forEach( (track) => {
             track._switchCamera();
         })
+        forceUpdate();
     }
 
     const onBodyClick = () => {
-        if(showControlButtons) {
-            setShowControlButtons(false);
-        } else {
-            setShowControlButtons(true);
-            const timeout = setTimeout(() => {
-                setShowControlButtons(false);
-            }, 3000);
-            setTimeOutToCloseButtons(timeout);
-        }
+        // if(showControlButtons) {
+        //     setShowControlButtons(false);
+        // } else {
+        //     setShowControlButtons(true);
+        //     const timeout = setTimeout(() => {
+        //         setShowControlButtons(false);
+        //     }, 3000);
+        //     setTimeOutToCloseButtons(timeout);
+        // }
     }
 
     const endCall = () => {

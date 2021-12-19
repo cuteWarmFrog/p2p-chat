@@ -13,6 +13,7 @@ import {RTCView} from "react-native-webrtc";
 export default function CameraModule(props) {
     const { stream, zOrder } = props;
 
+
     const renderStream = useCallback(() => {
         if(stream.getVideoTracks()[0].enabled) {
             return <RTCView zOrder={zOrder ? zOrder : 0} style={styles.camera} streamURL={stream.toURL()} />
@@ -35,8 +36,6 @@ export default function CameraModule(props) {
 
 const styles = StyleSheet.create({
     camera: {
-        // flex: Platform.OS === 'ios' ? 1 : 0,
-        // height: Platform.OS === 'ios' ? 'auto' : '100%',
         flex: 1,
         width: '120%',
         marginLeft: "-10%",
