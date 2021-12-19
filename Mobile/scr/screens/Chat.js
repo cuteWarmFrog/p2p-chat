@@ -176,12 +176,14 @@ export const Chat = ({ route }) => {
      const toggleMicro = () => {
        myStream.getAudioTracks()[0].enabled=isMicro;
        setIsMicro(!isMicro);
+         setRemoteStreams(remoteStreams);
     }
 
     const toggleCamera = () => {
         myStream.getVideoTracks()[0].enabled = isCamera;
         setIsCamera(!isCamera);
         forceUpdate();
+        setRemoteStreams(remoteStreams);
     }
 
     const switchCameraView = () => {
@@ -189,6 +191,7 @@ export const Chat = ({ route }) => {
             track._switchCamera();
         })
         forceUpdate();
+        setRemoteStreams(remoteStreams);
     }
 
     useEffect(() => {
