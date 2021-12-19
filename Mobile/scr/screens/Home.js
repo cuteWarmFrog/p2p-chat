@@ -48,12 +48,12 @@ export const Home = () => {
         const roomId = generateID();
         console.log(roomId); // Share this room id to another peer in order to join in the same room
         setRoomId(roomId);
-        navigation.navigate('Chat', { roomId , setLastConnectedRoom});
+        navigation.navigate('Chat', { roomId, login, setLastConnectedRoom});
     }
 
     const handleReconnect = () => {
         // Reconnect to room, using saved id
-        navigation.navigate('Chat', {roomId: lastConnectedRoom, setLastConnectedRoom} )
+        navigation.navigate('Chat', {roomId: lastConnectedRoom, login, setLastConnectedRoom} )
     }
 
     const handleLogin = async () => {
@@ -90,9 +90,11 @@ export const Home = () => {
             <View style={styles.buttonsWrapper}>
                 <SecondaryButton title='Join Room' onPress={ handleSubmit } />
                 <PrimaryButton title='Make Room' onPress={ handleCreateSubmit } />
-                {lastConnectedRoom && <SecondaryButton title='Reconnect' onPress={ handleReconnect } />}
-
             </View>
+
+            {lastConnectedRoom && <View style={styles.buttonsWrapper}>
+                    <SecondaryButton  title='Reconnect' onPress={ handleReconnect } />
+                </View>}
         </View>
     )
 }
@@ -131,6 +133,7 @@ const styles = StyleSheet.create({
     buttonsWrapper: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        width: '80%'
+        width: '80%',
+        marginVertical: 10
     }
 });
