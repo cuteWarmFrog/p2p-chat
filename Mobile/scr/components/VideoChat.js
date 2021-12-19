@@ -88,11 +88,14 @@ export const VideoChat = (
         console.log('good')
         remoteStreams.forEach((track, index) => {
             console.log(index)
-            if (!track.getVideoTracks()[0].enabled){
-                console.log('slicing')
-                let arrayStream = [...remoteStreams];
-                //setRemoteStreams(arrayStream.slice(index,1))
+            track.getVideoTracks().forEach(t=> {
+                if (t.enabled){
+                    console.log('slicing')
+                    let arrayStream = [...remoteStreams];
+                    //setRemoteStreams(arrayStream.slice(index,1))
+                }
             }
+        )
         })
     }, [myStream, remoteStreams]);
 

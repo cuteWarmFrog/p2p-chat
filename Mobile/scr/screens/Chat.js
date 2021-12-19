@@ -178,6 +178,7 @@ export const Chat = ({ route }) => {
     const toggleCamera = () => {
         myStream.getVideoTracks()[0].enabled = isCamera;
         setIsCamera(!isCamera);
+        forceUpdate();
     }
 
     const switchCameraView = () => {
