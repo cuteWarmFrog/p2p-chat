@@ -41,6 +41,7 @@ export const Home = () => {
     useEffect(() => {
         ( async () => {
             const log = await AsyncStorage.getItem('login');
+            // const log = await AsyncStorage.setItem(null);
             if(log) {
                 console.log(log);
                 setLogin(log);
