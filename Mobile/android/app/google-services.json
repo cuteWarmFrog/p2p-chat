@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "436348272154",
+    "project_id": "p2p-chat-61a4c",
+    "storage_bucket": "p2p-chat-61a4c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:436348272154:android:656407b634539e43dadba3",
+        "android_client_info": {
+          "package_name": "com.p2pvideo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "436348272154-9egnp12bjob94l3nvb4em6b9jqs0v99l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkij_q6BCvynkqf3xIa5SLs5z7Co_t25s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "436348272154-9egnp12bjob94l3nvb4em6b9jqs0v99l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
