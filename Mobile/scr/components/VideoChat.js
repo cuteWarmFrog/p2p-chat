@@ -24,7 +24,8 @@ export const VideoChat = (
         remoteStreams,
         roomId,
         showControlButtons,
-        controlButtons
+        controlButtons,
+        setRemoteStreams
     }) => {
     const { toggleMicro, toggleCamera, endCall, switchCameraView } = controlButtons;
     const [isPartnerBig, setIsPartnerBig] = useState(true);
@@ -100,6 +101,21 @@ export const VideoChat = (
             return renderMultipleStreams(myStream, remoteStreams);
         }
     },[myStream, remoteStreams]);
+
+    useEffect(() => {
+        console.log('good')
+        remoteStreams.forEach((track, index) => {
+            console.log(index)
+            track.getVideoTracks().forEach(t=> {
+                    if (!t.enabled){
+                        console.log('slicing')
+                        let arrayStream = [...remoteStreams];
+                        setRemoteStreams(arrayStream.slice(index,1))
+                    }
+                }
+            )
+        })
+    }, [myStream, remoteStreams]);
 
     const renderControlButtons = useCallback(() => {
         if (showControlButtons) {

@@ -27,7 +27,7 @@ export const Chat = ({ route }) => {
 
     //const [lastConnectedRoom, setLastConnectedRoom] = useState(null);
 
-    const forceUpdate = useForceUpdate();
+    //const forceUpdate = useForceUpdate();
 
     const [peer, setPeer] = useState(null);
 
@@ -176,38 +176,22 @@ export const Chat = ({ route }) => {
      const toggleMicro = () => {
        myStream.getAudioTracks()[0].enabled=isMicro;
        setIsMicro(!isMicro);
-         setRemoteStreams(remoteStreams);
+       //forceUpdate();
     }
 
     const toggleCamera = () => {
         myStream.getVideoTracks()[0].enabled = isCamera;
         setIsCamera(!isCamera);
-        forceUpdate();
-        setRemoteStreams(remoteStreams);
+       // forceUpdate();
     }
 
     const switchCameraView = () => {
         myStream.getVideoTracks().forEach( (track) => {
             track._switchCamera();
         })
-        forceUpdate();
-        setRemoteStreams(remoteStreams);
+       // forceUpdate();
     }
 
-    useEffect(() => {
-        console.log('good')
-        remoteStreams.forEach((track, index) => {
-            console.log(index)
-            track.getVideoTracks().forEach(t=> {
-                    if (t.enabled){
-                        console.log('slicing')
-                        let arrayStream = [...remoteStreams];
-                        setRemoteStreams(arrayStream.slice(index,1))
-                    }
-                }
-            )
-        })
-    }, [myStream, remoteStreams]);
 
     const onBodyClick = () => {
         // if(showControlButtons) {
@@ -253,6 +237,7 @@ export const Chat = ({ route }) => {
                     roomId={roomId}
                     showControlButtons={showControlButtons}
                     controlButtons={controlButtons}
+                    setRemoteStreams={setRemoteStreams}
                 />
         </TouchableOpacity>
     )
