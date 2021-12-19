@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import { Text, View, Button, TextInput, StyleSheet, Alert } from 'react-native';
+import { AsyncStorage } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import {PrimaryButton, SecondaryButton} from "../components/Themed";
 import messaging from '@react-native-firebase/messaging';
@@ -23,7 +24,17 @@ export const Home = () => {
         (() =>getFcmToken().then(token => {
             setToken(token)
         }))();
-    })
+    }, [])
+
+    useEffect(() => {
+        ( async () => {
+            const log = await AsyncStorage.getItem('login');
+            if(log) {
+                console.log(log);
+                setLogin(log);
+            }
+        })()
+    }, [])
 
     useEffect(() => {
         const unsubscribe = messaging().onMessage(async remoteMessage => {
@@ -85,6 +96,7 @@ export const Home = () => {
         axios.get(`${URL}/login`, { params: { userLogin: loginInput, token: token}})
             .then(response => {
                 if(response.data === 'Success login in Base!') {
+                    AsyncStorage.setItem('login', loginInput);
                     setLogin(loginInput);
                 } else {
                     setLogin(response.data);
@@ -100,7 +112,7 @@ export const Home = () => {
             .then(response => {
                 if(response.data === 'Login is taken!') {
                     const roomId = generateID();
-                    axios.get(`${URL}/call`, { params: { partnerLogin: toCall, login, roomId}})
+                    axios.get(`${URL}/call`, { params: { partnerLogin: toCall, login, roomId }})
                         .then(response => {
                             callCreateRoom(roomId);
                         })
@@ -111,13 +123,15 @@ export const Home = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>{login}</Text>
-            <TextInput
-                placeholder="Username"
-                onChangeText={(text) => setLoginInput(text)}
-                style={ styles.textInput }
-            />
-            <SecondaryButton title='Login' onPress={ checkLogin } />
+            <Text style={styles.title}>Your login: {login}</Text>
+            {login === 'your login' && <>
+                <TextInput
+                    placeholder="Username"
+                    onChangeText={(text) => setLoginInput(text)}
+                    style={styles.textInput}
+                />
+                <SecondaryButton title='Login' onPress={checkLogin}/>
+            </>}
             <TextInput
                 placeholder="to call"
                 onChangeText={(text) => setToCall(text)}
