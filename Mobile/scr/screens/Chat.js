@@ -12,8 +12,6 @@ import { useNavigation } from '@react-navigation/native';
 
 import { URL } from '../utils/urls';
 import {getFcmToken} from "../utils/firebase";
-import VIForegroundService from '@voximplant/react-native-foreground-service';
-// import BackgroundTimer from 'react-native-background-timer';
 
 export const Chat = ({ route }) => {
     const [myStream, setMyStream] = useState(null);
@@ -65,10 +63,13 @@ export const Chat = ({ route }) => {
         setMyStream(myStream);
 
         peerServer.on('open', async (userId) => {
+            console.log('in peerSocket open');
             // sending signal to server, on which
             // it will answer with room-joining and that roomId
             const token = await getFcmToken();
-            localSocket.emit('join-room', { userId, roomId, token, login });
+            console.log(token);
+            localSocket.emit('join-room', { userId, roomId });
+            console.log('after join-room');
 
             console.log('join-room: ', userId, roomId);
         })
@@ -85,15 +86,13 @@ export const Chat = ({ route }) => {
         localSocket.on('user-connected', (userId) => {
             // after server transfer user id, try to connect to
             // new room
+            console.log('in uc');
             connectToNewUser(userId, myStream);
         })
 
     }, []);
 
     useEffect(() => {
-
-
-
        // startForegroundService().then(r => {console.log('back service is running')});
 
         console.log('in useEffect');

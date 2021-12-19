@@ -15,7 +15,6 @@ export const Home = () => {
     const navigation = useNavigation();
     const [roomId, setRoomId] = useState('');
     const [login, setLogin] = useState('');
-    const [token, setToken] = useState('emptyToken');
 
     useEffect(() => {
         const unsubscribe = messaging().onMessage(async remoteMessage => {
